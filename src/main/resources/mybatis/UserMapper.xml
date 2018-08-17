@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zcc.game.mapper.UserMapper">
+ 
+ 
+ <select id="getUsers" resultType="com.zcc.game.vo.UserVO">
+ 	select 
+ 		bank_num as bankNum,
+ 		bank_name as bankName,
+ 		jf_diya as jfDiya,
+ 		task_token as taskToken,
+ 		create_date as createDate,
+ 		lastup_date as lastupDate
+ 	 from gm_user_t
+ </select>
+ 
+
+ 
+</mapper>
