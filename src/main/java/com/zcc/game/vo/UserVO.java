@@ -32,6 +32,8 @@ public class UserVO {
 	private Integer jfDiya;
 	private Integer taskToken;
 	private Integer usedtoken;
+	private Integer version;
+	private String jfold;
 	private Integer pid;
 	private Date createDate;
 	private Date lastupDate;
@@ -161,6 +163,18 @@ public class UserVO {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public Integer getVersion() {
+		return version;
+	}
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+	public String getJfold() {
+		return jfold;
+	}
+	public void setJfold(String jfold) {
+		this.jfold = jfold;
 	}
 	
 	

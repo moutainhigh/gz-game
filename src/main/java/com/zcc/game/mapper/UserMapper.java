@@ -17,8 +17,14 @@ import com.zcc.game.vo.UserVO;
  */
 @Component
 public interface UserMapper {
-	public List<UserVO> getUsers(UserVO user);
 	
+	public List<UserVO> getUsers(UserVO user);
+	public List<UserVO> getChilds(UserVO user);
+	public int insertUser(UserVO user);
+	public int updateUser(UserVO user);
+	public int gaveToken(UserVO user);
+	
+
 	
 	
 }

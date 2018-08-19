@@ -3,18 +3,110 @@
 
 <mapper namespace="com.zcc.game.mapper.UserMapper">
  
- 
- <select id="getUsers" resultType="com.zcc.game.vo.UserVO">
- 	select 
+ <sql id="baseUserColoumn">
+ 		*,
  		bank_num as bankNum,
  		bank_name as bankName,
  		jf_diya as jfDiya,
  		task_token as taskToken,
  		create_date as createDate,
  		lastup_date as lastupDate
+ </sql>
+ <select id="getUsers" resultType="com.zcc.game.vo.UserVO">
+ 	select 
+ 		<include refid="baseUserColoumn"/>
  	 from gm_user_t
+ 	 <where>
+ 	 	<if test="id != null">
+			and id=#{id}
+		</if>
+		<if test="account != null">
+			and account=#{account}
+		</if>
+		<if test="password != null">
+			and password=#{password}
+		</if>
+ 	 </where>
  </select>
+ <select id="getChilds">
+ 	select 
+ 		<include refid="baseUserColoumn"/>
+ 	 from gm_user_t
+ 	 <where>
+ 	 	<if test="id != null">
+			and pid=#{id}
+		</if>
+ 	 </where>
+ </select>
+ <insert id="insertUser">
+ 	INSERT INTO gm_user_t (account,password,safepwd,jfzhuce,jf_diya,status,pid,jfold,create_date)
+	VALUES (#{account},#{password},#{safepwd},#{jfzhuce},#{jfDiya},'0',#{pid},#{jfold},NOW())
+ </insert>
  
-
+	<update id="updateUser">
+		UPDATE gm_user_t  
+		<set>
+			<if test="password != null">
+				PASSWORD=#{password},
+			</if>
+			<if test="safepwd != null">
+				safepwd=#{safepwd},
+			</if>
+			<if test="username != null">
+				username=#{username},
+			</if>
+			<if test="telephone != null">
+				telephone=#{telephone},
+			</if>
+			<if test="alipaypic != null">
+				alipaypic=#{alipaypic},
+			</if>
+			<if test="weixinpic != null">
+				weixinpic=#{weixinpic},
+			</if>
+			<if test="bankName != null">
+				bank_name=#{bankName},
+			</if>
+			<if test="bankNum != null">
+				bank_num=#{bankNum},
+			</if>
+			<if test="jfzhuce != null">
+				jfzhuce=jfzhuce+#{jfzhuce},
+			</if>
+			<if test="jfcenter != null">
+				jfcenter=jfcenter+#{jfcenter},
+			</if>
+			<if test="jftask != null">
+				jftask=jftask+#{jftask},
+			</if>
+			<if test="jfbusiness != null">
+				jfbusiness=jfbusiness+#{jfbusiness},
+			</if>
+			<if test="taskToken != null">
+				task_token=#{taskToken},
+			</if>
+			<if test="usedtoken != null">
+				usedtoken=#{usedtoken},
+			</if>
+			<if test="status != null">
+				STATUS=#{status},
+			</if>
+			<if test="version != null">
+				version=#{version},
+			</if>
+			lastup_date=NOW()
+		</set>
+		<where>
+			<if test="id != null">
+				and id=#{id}
+			</if>
+			<if test="account != null">
+				and account=#{account}
+			</if>
+			<if test="password != null">
+				and password=#{password}
+			</if>
+		</where>
+	</update>
  
 </mapper>

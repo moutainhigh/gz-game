@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zcc.game.mapper.HomeMapper">
+ 
+  <!-- 获取公告 -->
+ <select id="getNotices" resultType="com.zcc.game.vo.NoticeVO">
+ 	SELECT id,title,content,attribute1,attribute2,create_date 
+ 	FROM gm_notice_t 
+ 	order by create_date desc
+ 	LIMIT 5
+ </select>
+ 
+ <!-- 查看挂卖信息 -->
+ <select id="getBusiness" resultType="com.zcc.game.vo.BusinessVO">
+ 	SELECT *
+ 	FROM gm_business_t 
+ 	<where>
+ 		<if test="status!=null">
+ 			and status=#{status}
+ 		</if>
+ 		<if test="userid != null">
+ 			and userid=#{userid}
+ 		</if>
+ 		<if test="buyerid != null">
+ 			and buyerid=#{buyerid}
+ 		</if>
+ 		<if test="id != null">
+ 			and id=#{id}
+ 		</if>
+ 	</where>
+ 	order by create_date desc
+ </select>
+ <!-- 添加挂卖 -->
+ <insert id="addBusiness">
+ 	INSERT INTO gm_business_t 
+	(userid,sellername,sellcard,sellweixin,sellali,selljf,STATUS,create_date)
+	VALUES (#{userid},
+	(SELECT username FROM gm_user_t WHERE id=#{userid}),
+	(SELECT bank_num FROM gm_user_t WHERE id=#{userid}),
+	(SELECT weixinpic FROM gm_user_t WHERE id=#{userid}),
+	(SELECT alipaypic FROM gm_user_t WHERE id=#{userid}),
+	#{selljf},1,now())
+ </insert> 
+ <!-- 更新挂卖信息 -->
+ <update id="updateBusiness">
+ 	update gm_business_t 
+ 	<set>
+ 		<if test="status != null">
+ 			status=#{status},
+ 		</if>
+ 		<if test="buyerid != null">
+ 			buyerid=#{buyerid},
+ 			buyercard=(SELECT bank_num FROM gm_user_t WHERE id=#{buyerid}),
+ 		</if>
+ 		<if test="buytime != null">
+ 			buytime=#{buytime},
+ 		</if>
+ 		<if test="configtime != null">
+ 			configtime=#{configtime},
+ 		</if>
+ 		<if test="finishtime != null">
+ 			finishtime=#{finishtime},
+ 		</if>
+ 		lastup_date=now()
+ 	</set>
+ 	<where>
+ 		<if test="id != null">
+ 			and id=#{id}
+ 		</if>
+ 	</where>
+ </update>
+ <!-- 添加任务 -->
+ <insert id="addTask">
+ 	INSERT INTO gm_task_t(title,STATUS,taskjf,userid,username,create_date) 
+ 	VALUES (#{title},#{status},#{taskjf},#{userid},
+ 	(SELECT username FROM gm_user_t WHERE id=#{userid}),
+ 	now())
+ </insert> 
+ <!-- 更新任务信息 -->
+ <update id="updateTask">
+ 	update gm_task_t 
+ 	<set>
+ 		<if test="status != null">
+ 			status=#{status},
+ 		</if>
+ 		lastup_date=now()
+ 	</set>
+ 	<where>
+ 		<if test="id != null">
+ 			and id=#{id}
+ 		</if>
+ 	</where>
+ </update>
+ <!-- 查看任务信息 -->
+ <select id="getTask" resultType="com.zcc.game.vo.TaskVO">
+ 	SELECT *
+ 	FROM gm_task_t 
+ 	<where>
+ 		<if test="status!=null">
+ 			and status=#{status}
+ 		</if>
+ 		<if test="id != null">
+ 			and id=#{id}
+ 		</if>
+ 	</where>
+ </select>
+  <!-- 查看中奖信息 -->
+ <select id="getData" resultType="com.zcc.game.vo.DataVO">
+ 	SELECT *
+ 	FROM gm_data_t 
+ 	<where>
+ 		<if test="gmnum!=null">
+ 			and gmnum=#{gmnum}
+ 		</if>
+ 		<if test="id != null">
+ 			and id=#{id}
+ 		</if>
+ 	</where>
+ </select>
+ <!-- 添加开奖信息 -->
+ <insert id="addData">
+ 	INSERT INTO gm_data_t(gmnum,gm1,gm2,gm3,gm4,gm5,gmsum,bgm1,bgm2,bgm3,bgm4,bgm5,bgmsum,sgm1,sgm2,sgm3,sgm4,sgm5,sgmsum,create_date,lastup_date) 
+ 	VALUES (#{gmnum},#{gm1},#{gm2},#{gm3},#{gm4},#{gm5},#{gmsum},
+ 	#{bgm1},#{bgm2},#{bgm3},#{bgm4},#{bgm5},#{bgmsum},
+ 	#{sgm1},#{sgm2},#{sgm3},#{sgm4},#{sgm5},#{sgmsum},now(),now())
+ </insert> 
+ 
+ <!-- 下注 -->
+  <insert id="addPool">
+ 	INSERT INTO gm_pool_t(userid,username,gmnum,gmname,jf,status,buyinfo,winjf,getjf,count,sumjf,create_date,lastup_date) 
+ 	VALUES (#{userid},
+ 	(SELECT username FROM gm_user_t WHERE id=#{userid}),
+ 	#{gmnum},'时时彩',#{jf},1,#{buyinfo},#{winjf},#{getjf},#{count},#{sumjf},now(),now())
+ </insert> 
+ 
+ 
+</mapper>
