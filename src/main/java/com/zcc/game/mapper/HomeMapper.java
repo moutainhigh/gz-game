@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.DataVO;
+import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.TaskVO;
@@ -35,7 +36,12 @@ public interface HomeMapper {
 	public int addData(DataVO task);
 	
 	public int addPool(PoolVO pool);
+	public List<PoolVO> getPools(PoolVO pool);
+	public int updatePools(List<PoolVO> pools);
 	
+	//添加留言
+	public int addMessage(MessageVO message);
+	public List<MessageVO> getMessages(MessageVO message);
 	
 	
 }

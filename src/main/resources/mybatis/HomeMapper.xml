@@ -126,13 +126,56 @@
  	#{sgm1},#{sgm2},#{sgm3},#{sgm4},#{sgm5},#{sgmsum},now(),now())
  </insert> 
  
- <!-- 下注 -->
+ <!-- 下注 ——扣减任务积分-->
   <insert id="addPool">
- 	INSERT INTO gm_pool_t(userid,username,gmnum,gmname,jf,status,buyinfo,winjf,getjf,count,sumjf,create_date,lastup_date) 
- 	VALUES (#{userid},
+ 	INSERT INTO gm_pool_t(userid,backjf,username,gmnum,gmname,jf,status,buyinfo,winjf,getjf,count,sumjf,create_date,lastup_date) 
+ 	VALUES (#{userid},#{backjf},
  	(SELECT username FROM gm_user_t WHERE id=#{userid}),
- 	#{gmnum},'时时彩',#{jf},1,#{buyinfo},#{winjf},#{getjf},#{count},#{sumjf},now(),now())
+ 	#{gmnum},'时时彩',#{jf},0,#{buyinfo},#{winjf},#{getjf},#{count},#{sumjf},now(),now());
+ 	update gm_user_t set jftask=jftask-#{jf},lastup_date=#{item.lastup_date}
+  				where id=#{userid} 
  </insert> 
- 
+ <select id="getPools" resultType="com.zcc.game.vo.PoolVO">
+ 	SELECT *
+ 	FROM gm_pool_t 
+ 	<where>
+ 		<if test="gmnum!=null">
+ 			and gmnum=#{gmnum}
+ 		</if>
+ 		<if test="id != null">
+ 			and id=#{id}
+ 		</if>
+ 		<if test="userid != null">
+ 			and userid=#{userid}
+ 		</if>
+ 		<if test="status != null">
+ 			and status=#{status}
+ 		</if>
+ 	</where>
+ </select>
+ <update id="updatePools">
+ 		<foreach collection="list" item="item" separator=";">
+			update gm_pool_t
+			set status=#{item.status},lastup_date=#{item.lastup_date}
+  			WHERE id =#{item.id}
+  			<if test="item.status==1">
+  				;update gm_user_t set jfcenter=jfcenter+#{item.getjf}+#{item.backjf},lastup_date=#{item.lastup_date}
+  				where id=#{item.userid}
+  			</if>
+  			<if test="item.status!=1">
+  				;update gm_user_t set jfcenter=jfcenter+#{item.backjf},lastup_date=#{item.lastup_date}
+  				where id=#{item.userid}
+  			</if>
+		</foreach>
+ </update>
+ <insert id="addMessage">
+ 	insert into gm_message_t(content,userid,username,create_date,lastup_date)
+ 	values (#{content},#{userid},
+ 	(SELECT username FROM gm_user_t WHERE id=#{userid}),now(),now())
+ </insert>
+ <select id="getMessages" resultType="com.zcc.game.vo.MessageVO">
+ 	select * from gm_message_t
+ 	where userid=#{userid}
+ </select>
  
 </mapper>

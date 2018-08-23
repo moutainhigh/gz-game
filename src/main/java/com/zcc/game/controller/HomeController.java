@@ -13,12 +13,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.zcc.game.common.SysCode;
+import com.zcc.game.mq.RabbitMQSender;
 import com.zcc.game.service.HomeService;
 import com.zcc.game.service.UserService;
 import com.zcc.game.utils.DateUtil;
 import com.zcc.game.utils.MD5Util;
 import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.DataVO;
+import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.TaskVO;
@@ -32,6 +34,9 @@ public class HomeController extends BaseController{
 	private HomeService homeService;
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private RabbitMQSender rabbitMQSender;
 	
 	//获取公告
 	@RequestMapping("/getNotice")
@@ -245,7 +250,7 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}		
-	//获取公告
+	//获取开奖
 	@RequestMapping("/getData")
 	public void getData(HttpServletRequest request,HttpServletResponse response){
 		
@@ -271,7 +276,7 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
-	//增添任务信息
+	//增添开奖信息
 	@RequestMapping("/addData")
 	public void addData(HttpServletRequest request,HttpServletResponse response){
 		
@@ -302,6 +307,7 @@ public class HomeController extends BaseController{
 	        //添加任务
 	    	int result = homeService.addData(data);
 	    	if(result ==1){
+	    		rabbitMQSender.send("test-queue",data.getGmnum());
 	    		renderJson(request, response, SysCode.SUCCESS, result);
 			}else{
 				renderJson(request, response, SysCode.SUCCESS, result);
@@ -348,7 +354,7 @@ public class HomeController extends BaseController{
 		}
 	}
 	
-	//增添任务信息
+	//增添下注信息
 	@RequestMapping("/addPool")
 	public void addPool(HttpServletRequest request,HttpServletResponse response){
 		
@@ -371,12 +377,21 @@ public class HomeController extends BaseController{
         data.setBuyinfo(type);
         data.setGmnum(gmnum);
         int win=Integer.parseInt(jf);
-        double w=Integer.parseInt(count)*win*1.98;
-        double n=w-Integer.parseInt(count)*win*0.98;
+        int w=Integer.parseInt(count)*win*198;
+        int n=Integer.parseInt(count)*win*98;
         data.setWinjf(n+"");
         data.setGetjf(w+"");
         data.setCount(Integer.parseInt(count));
         data.setSumjf(Integer.parseInt(count)*win);//合计积分
+        data.setBackjf("100");//返还一个积分
+        //校验用户有效性和足够的积分。
+        UserVO user=new UserVO();
+        user.setId(Integer.parseInt(userid));
+        List<UserVO> users = userService.getUsers(user);
+        if(users==null || users.get(0).getJftask()<win){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足");
+        	return;
+        }
         try {
 	        //下注
 	    	int result = homeService.addPool(data);
@@ -391,4 +406,87 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}	
+	
+	//查看投注记录
+	@RequestMapping("/getPools")
+	public void getPools(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userid"};
+		Map<String, String> params = parseParams(request, "getPools", paramKey);
+		String userid = params.get("userid"); 
+		
+		if(StringUtils.isBlank(userid) ){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+		
+		PoolVO pool=new PoolVO();
+		pool.setUserid(userid);
+        try {
+	        //获取开奖数据
+	    	List<PoolVO> result = homeService.getPools(pool);
+	    	if(result !=null && result.size()>0){
+	    		renderJson(request, response, SysCode.SUCCESS, result);
+			}else{
+				renderJson(request, response, SysCode.SUCCESS, result);
+			}
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getPools()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+	
+	//添加留言
+	@RequestMapping("/addMessage")
+	public void addMessage(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userid","content"};
+		Map<String, String> params = parseParams(request, "addMessage", paramKey);
+		String userid = params.get("userid"); 
+		String content = params.get("content"); 
+		
+		if(StringUtils.isBlank(userid) ||StringUtils.isBlank(content)){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+		
+		MessageVO message=new MessageVO();
+		message.setUserid(userid);
+		message.setContent(content);
+        try {
+	        //添加留言
+	    	int result = homeService.addMessage(message);
+	    	renderJson(request, response, SysCode.SUCCESS, result);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````addMessage()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+	//查看留言
+	@RequestMapping("/getMessages")
+	public void getMessages(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userid"};
+		Map<String, String> params = parseParams(request, "getMessages", paramKey);
+		String userid = params.get("userid"); 
+		
+		if(StringUtils.isBlank(userid) ){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+		
+		MessageVO message=new MessageVO();
+		message.setUserid(userid);
+        try {
+	        //添加留言
+	    	List<MessageVO> result = homeService.getMessages(message);
+	    	renderJson(request, response, SysCode.SUCCESS, result);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getMessages()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
 }
