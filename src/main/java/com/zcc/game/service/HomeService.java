@@ -1,14 +1,17 @@
 package com.zcc.game.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.catalina.User;
+import org.quartz.JobDataMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sun.tools.javac.jvm.Pool;
+import com.zcc.game.common.OrderJob;
+import com.zcc.game.common.QuartzJobUtils;
 import com.zcc.game.mapper.HomeMapper;
 import com.zcc.game.mapper.UserMapper;
 import com.zcc.game.vo.BusinessVO;
@@ -17,6 +20,7 @@ import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.TaskVO;
+import com.zcc.game.vo.TokenVO;
 import com.zcc.game.vo.UserVO;
 
 @Service
@@ -27,14 +31,30 @@ public class HomeService {
 	@Autowired
 	private UserMapper userMapper;
 	
+	/**
+     * 获取定时任务执行时间
+     * @param fixTime
+     * @return
+     */
+    private String getCronExpressionByFixTime(int num) {
+    	Calendar calendar = Calendar.getInstance();
+    	calendar.add(Calendar.SECOND, num);
+    	Date date = calendar.getTime();
+    	
+    	SimpleDateFormat sdf = new SimpleDateFormat("ss mm HH dd MM ? yyyy");
+    	
+        return sdf.format(date);
+    }
+    
 	public List<NoticeVO> getNotices(NoticeVO notice){
 		return homeMapper.getNotices(notice);
 	}
 	public List<BusinessVO> getBusiness(BusinessVO business){
 		return homeMapper.getBusiness(business);
 	}
-	public int addBusiness(BusinessVO business){
-		return homeMapper.addBusiness(business);
+	public int addBusiness(BusinessVO business) throws Exception{
+		int num = homeMapper.addBusiness(business);
+		return num;
 	}
 	public int addMessage(MessageVO message){
 		return homeMapper.addMessage(message);
@@ -42,19 +62,45 @@ public class HomeService {
 	public List<MessageVO> getMessages(MessageVO message){
 		return homeMapper.getMessages(message);
 	}
-	
+	public int addToken(TokenVO token){
+		return homeMapper.addToken(token);
+	}
+	public List<TokenVO> getTokens(TokenVO token){
+		return homeMapper.getTokens(token);
+	}
+	//回调，检查交易数据,未打款，封号，1，待售，2，交易中，3，已完成。4，过期
+	@Transactional
+	public void checkBusiness(String id){
+		BusinessVO business=new BusinessVO();
+		business.setId(Integer.parseInt(id));
+		List<BusinessVO> bs=homeMapper.getBusiness(business);
+		String status = bs.get(0).getStatus();
+		String userid = bs.get(0).getUserid();
+		if("2".equals(status)){//待交易，封号，创建新记录交易。
+			business.setStatus("4");//返回待交易状态
+			homeMapper.updateBusiness(business);
+			UserVO user=new UserVO();
+			user.setId(Integer.parseInt(userid));
+			user.setStatus("1");//无效账号
+			userMapper.updateUser(user);
+			BusinessVO newBs=new BusinessVO();
+			newBs.setUserid(bs.get(0).getUserid());
+			newBs.setSelljf(bs.get(0).getSelljf());
+			homeMapper.addBusiness(newBs);
+		}
+	}
 	
 	@Transactional
-	public int updateBusiness(BusinessVO business){
+	public int updateBusiness(BusinessVO business) throws Exception{
 		if("4".equals(business.getStatus())){//过期未付款，从新生成挂卖信息，封号买家
-			BusinessVO addbusiness = new BusinessVO();
-			addbusiness.setUserid(business.getUserid());
-			addbusiness.setSelljf(business.getSelljf());
-	        homeMapper.addBusiness(addbusiness);
-	        UserVO user=new UserVO();
-	        user.setId(Integer.parseInt(business.getBuyerid()));
-	        user.setStatus("1");//封号
-	        userMapper.updateUser(user);
+//			BusinessVO addbusiness = new BusinessVO();
+//			addbusiness.setUserid(business.getUserid());
+//			addbusiness.setSelljf(business.getSelljf());
+//	        homeMapper.addBusiness(addbusiness);
+//	        UserVO user=new UserVO();
+//	        user.setId(Integer.parseInt(business.getBuyerid()));
+//	        user.setStatus("1");//封号
+//	        userMapper.updateUser(user);
 		}else if("3".equals(business.getStatus())){//卖家确认收款，积分转换，交易完成
 			BusinessVO tempVO=new BusinessVO();
 			tempVO.setId(business.getId());
@@ -69,7 +115,17 @@ public class HomeService {
 			userMapper.updateUser(user);//购买人增加积分
 			user.setId(Integer.parseInt(sellerId));
 			user.setJfbusiness(-jf);
+			user.setPretake(-jf);
 			userMapper.updateUser(user);//卖出人减去积分
+		}else if("2".equals(business.getStatus())){//买家购买，状态变为交易中
+			//添加定时任务，24小时之内付款，否则封号，解压状态继续售卖。
+			// 添加定时任务
+	     	JobDataMap jobDataMap = new JobDataMap();
+	        jobDataMap.put("businessid", business.getId()+"");
+	        jobDataMap.put("HomeService", this);
+	        
+	        //获取后台参数
+	        QuartzJobUtils.addJob("CANCEL_ORDER_"+business.getId(), OrderJob.class, getCronExpressionByFixTime(60), jobDataMap);
 		}
 		return homeMapper.updateBusiness(business);
 	}

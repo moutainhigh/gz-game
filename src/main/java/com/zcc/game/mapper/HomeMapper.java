@@ -15,6 +15,7 @@ import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.TaskVO;
+import com.zcc.game.vo.TokenVO;
 
 /**
  * @author c0z00k8
@@ -43,5 +44,8 @@ public interface HomeMapper {
 	public int addMessage(MessageVO message);
 	public List<MessageVO> getMessages(MessageVO message);
 	
+	//赠送秘钥
+	public int addToken(TokenVO token);
+	public List<TokenVO> getTokens(TokenVO token);
 	
 }

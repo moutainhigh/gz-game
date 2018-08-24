@@ -17,6 +17,9 @@
  		<include refid="baseUserColoumn"/>
  	 from gm_user_t
  	 <where>
+ 	 	<if test="status != null">
+			and status=#{status}
+		</if>
  	 	<if test="id != null">
 			and id=#{id}
 		</if>
@@ -28,7 +31,7 @@
 		</if>
  	 </where>
  </select>
- <select id="getChilds">
+ <select id="getChilds" resultType="com.zcc.game.vo.UserVO">
  	select 
  		<include refid="baseUserColoumn"/>
  	 from gm_user_t
@@ -81,6 +84,9 @@
 			</if>
 			<if test="jfbusiness != null">
 				jfbusiness=jfbusiness+#{jfbusiness},
+			</if>
+			<if test="pretake != null">
+				pretake=pretake+#{pretake},
 			</if>
 			<if test="taskToken != null">
 				task_token=#{taskToken},

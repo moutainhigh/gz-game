@@ -32,7 +32,7 @@
  	order by create_date desc
  </select>
  <!-- 添加挂卖 -->
- <insert id="addBusiness">
+ <insert id="addBusiness" useGeneratedKeys="true" keyProperty="id">
  	INSERT INTO gm_business_t 
 	(userid,sellername,sellcard,sellweixin,sellali,selljf,STATUS,create_date)
 	VALUES (#{userid},
@@ -40,7 +40,8 @@
 	(SELECT bank_num FROM gm_user_t WHERE id=#{userid}),
 	(SELECT weixinpic FROM gm_user_t WHERE id=#{userid}),
 	(SELECT alipaypic FROM gm_user_t WHERE id=#{userid}),
-	#{selljf},1,now())
+	#{selljf},1,now());
+	update gm_user_t set pretake=pretake+#{pretake} where id=#{userid}
  </insert> 
  <!-- 更新挂卖信息 -->
  <update id="updateBusiness">
@@ -168,14 +169,36 @@
   			</if>
 		</foreach>
  </update>
+ <!-- 添加留言 -->
  <insert id="addMessage">
  	insert into gm_message_t(content,userid,username,create_date,lastup_date)
  	values (#{content},#{userid},
  	(SELECT username FROM gm_user_t WHERE id=#{userid}),now(),now())
  </insert>
+ <!-- 查看留言列表 -->
  <select id="getMessages" resultType="com.zcc.game.vo.MessageVO">
  	select * from gm_message_t
  	where userid=#{userid}
+ </select>
+ <!-- 赠送秘钥 -->
+ <insert id="addToken">
+ 	insert into gm_token_t(account,tokennum,userid,username,create_date,lastup_date)
+ 	values (#{account},#{tokennum},#{userid},
+ 	(SELECT username FROM gm_user_t WHERE id=#{userid}),now(),now());
+ 	update gm_user_t set task_token=task_token-#{tokennum},lastup_date=now() where id=#{userid};
+ 	update gm_user_t set task_token=task_token+#{tokennum},lastup_date=now() where account=#{account}
+ </insert>
+ <!-- 查看秘钥赠送列表 -->
+ <select id="getTokens" resultType="com.zcc.game.vo.TokenVO">
+ 	select * from gm_token_t
+ 	<where>
+ 		<if test="userid!=null">
+ 			and userid=#{userid}
+ 		</if>
+ 		<if test="account != null">
+ 			and account=#{account}
+ 		</if>
+ 	</where>
  </select>
  
 </mapper>

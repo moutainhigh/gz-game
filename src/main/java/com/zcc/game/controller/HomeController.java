@@ -1,5 +1,7 @@
 package com.zcc.game.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -8,10 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.quartz.JobDataMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.zcc.game.common.OrderJob;
+import com.zcc.game.common.QuartzJobUtils;
 import com.zcc.game.common.SysCode;
 import com.zcc.game.mq.RabbitMQSender;
 import com.zcc.game.service.HomeService;
@@ -24,6 +29,7 @@ import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.TaskVO;
+import com.zcc.game.vo.TokenVO;
 import com.zcc.game.vo.UserVO;
 
 @Controller
@@ -61,16 +67,18 @@ public class HomeController extends BaseController{
 	//获取挂卖信息
 	@RequestMapping("/getBusiness")
 	public void getBusiness(HttpServletRequest request,HttpServletResponse response){
-		String[] paramKey = {"status"};
+		String[] paramKey = {"status","userid"};
 		Map<String, String> params = parseParams(request, "getBusiness", paramKey);
-        String status = params.get("status"); 
-        if(StringUtils.isBlank(status) ){//
-        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
-        	return;
-        }
+        String status = params.get("status"); //1待售，2交易中，3，完成，4，过期
+        String userid = params.get("userid"); 
+//        if(StringUtils.isBlank(status) ){//
+//        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+//        	return;
+//        }
         
         BusinessVO business = new BusinessVO();
         business.setStatus(status);
+        business.setUserid(userid);
         try {
 	        //获取挂卖信息
 	    	List<BusinessVO> result = homeService.getBusiness(business);
@@ -85,6 +93,7 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
+    
 	//增添挂卖信息
 	@RequestMapping("/addBusiness")
 	public void addBusiness(HttpServletRequest request,HttpServletResponse response){
@@ -105,14 +114,16 @@ public class HomeController extends BaseController{
         //验证用户信息
         UserVO user=new UserVO();
         user.setId(Integer.parseInt(userid));
+        user.setStatus("0");
         List<UserVO> users = userService.getUsers(user);
         if(users ==null || users.size()<=0){
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
         int businessjf=users.get(0).getJfbusiness();
+        int pretake=users.get(0).getPretake();//预扣减
     	String pwd=users.get(0).getSafepwd();
-    	if(businessjf<Integer.parseInt(selljf) || !MD5Util.MD5(safepwd).equals(pwd)){
+    	if(businessjf-pretake<Integer.parseInt(selljf) || !MD5Util.MD5(safepwd).equals(pwd)){
     		renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足或密码错误");
         	return;
     	}
@@ -486,6 +497,89 @@ public class HomeController extends BaseController{
         } catch (Exception e) {
         	e.printStackTrace();
         	logger.info("`````method``````getMessages()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+	//添加赠送秘钥记录
+	@RequestMapping("/addToken")
+	public void addToken(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userid","account","tokennum","safepwd"};
+		Map<String, String> params = parseParams(request, "addToken", paramKey);
+		String userid = params.get("userid"); 
+		String account = params.get("account"); 
+		String tokennum = params.get("tokennum"); 
+		String safepwd = params.get("safepwd"); 
+		
+		if(StringUtils.isBlank(userid) ||StringUtils.isBlank(account)||
+				StringUtils.isBlank(tokennum) ||StringUtils.isBlank(safepwd)){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+		
+		TokenVO token=new TokenVO();
+		token.setUserid(userid);
+		token.setAccount(account);
+		token.setTokennum(tokennum);
+		
+		UserVO user=new UserVO();
+		user.setId(Integer.parseInt(userid));
+		List<UserVO> users = userService.getUsers(user);
+		if(users.size()<=0 || !users.get(0).getSafepwd().equals(MD5Util.MD5(safepwd))){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "安全码有误");
+        	return;
+		}
+		if(users.get(0).getTaskToken()<Integer.parseInt(tokennum)){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "秘钥不足");
+        	return;
+		}
+		int num=0;
+		List<UserVO> childUsers = userService.getChilds(user);
+		for (int i = 0; i < childUsers.size(); i++) {
+			String userAccount = childUsers.get(i).getAccount();
+			if(userAccount.equals(account)){
+				num=1;
+				break;
+			}
+		}
+		if(num==0){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "只能给下级赠送秘钥");
+        	return;
+		}
+        try {
+	        //赠送秘钥
+	    	int result = homeService.addToken(token);
+	    	renderJson(request, response, SysCode.SUCCESS, result);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````addToken()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+	//查看秘钥
+	@RequestMapping("/getTokens")
+	public void getTokens(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userid","account"};
+		Map<String, String> params = parseParams(request, "getTokens", paramKey);
+		String userid = params.get("userid"); 
+		String account = params.get("account"); 
+		
+		if(StringUtils.isBlank(userid) && StringUtils.isBlank(account)){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+		
+		TokenVO token=new TokenVO();
+		token.setUserid(userid);
+		token.setAccount(account);
+        try {
+	        //获取赠送秘钥列表
+	    	List<TokenVO> result = homeService.getTokens(token);
+	    	renderJson(request, response, SysCode.SUCCESS, result);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getTokens()`````"+e.getMessage());
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}

@@ -35,9 +35,16 @@ public class UserVO {
 	private Integer version;
 	private String jfold;
 	private Integer pid;
+	private Integer pretake;
 	private Date createDate;
 	private Date lastupDate;
 	
+	public Integer getPretake() {
+		return pretake;
+	}
+	public void setPretake(Integer pretake) {
+		this.pretake = pretake;
+	}
 	public Integer getId() {
 		return id;
 	}
