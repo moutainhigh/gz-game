@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
@@ -187,10 +188,10 @@ public class UserController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
-        if(!"".equals(user.getPassword())){//修改密码
+        if(null != user.getPassword() && !"".equals(user.getPassword())){//修改密码
         	user.setPassword(MD5Util.MD5(user.getPassword()));
         }
-        if(!"".equals(user.getSafepwd())){//修改安全码
+        if(null != user.getSafepwd() && !"".equals(user.getSafepwd())){//修改安全码
         	user.setSafepwd(MD5Util.MD5(user.getSafepwd()));
         }
         int result =0;
@@ -205,6 +206,60 @@ public class UserController extends BaseController{
         } catch (Exception e) {
         	e.printStackTrace();
         	logger.info("`````method``````updateUser()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+	
+	@RequestMapping("/fogetPwd")
+//	@ResponseBody
+	public void fogetPwd(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"id","password","newpassword","safepwd","newsafepwd"};
+        Map<String, String> params = parseParams(request, "fogetPwd", paramKey);
+        
+        String id = params.get("id"); 
+        String password = params.get("password"); 
+        String newpassword = params.get("newpassword"); 
+        String safepwd = params.get("safepwd"); 
+        String newsafepwd = params.get("newsafepwd"); 
+        if(StringUtils.isBlank(id)){//
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+        if(StringUtils.isBlank(password) && StringUtils.isBlank(safepwd)){//
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+        UserVO user=new UserVO();
+        user.setId(Integer.parseInt(id));
+        List<UserVO> users = userService.getUsers(user);
+        if(StringUtils.isNotBlank(password) && StringUtils.isNotBlank(newpassword)){//修改密码
+        	if(users==null || users.size()<1 || !MD5Util.MD5(password).equals(users.get(0).getPassword())){
+        		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+            	return;
+        	}
+        	user.setPassword(MD5Util.MD5(newpassword));
+        }
+        if(StringUtils.isNotBlank(safepwd) && StringUtils.isNotBlank(newsafepwd)){//修改安全码
+        	if(users==null || users.size()<1 || !MD5Util.MD5(safepwd).equals(users.get(0).getSafepwd())){
+        		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+            	return;
+        	}
+        	user.setSafepwd(MD5Util.MD5(newsafepwd));
+        }
+        
+        int result =0;
+        try {
+	        //更新
+	    	result = userService.updateUser(user);
+	    	if(result==1){
+	    		renderJson(request, response, SysCode.SUCCESS, result);
+			}else{
+				renderJson(request, response, SysCode.SYS_ERR, "更新失败");
+			}
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````fogetPwd()`````"+e.getMessage());
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
@@ -234,7 +289,7 @@ public class UserController extends BaseController{
         }
         int tokennum = list.get(0).getTaskToken();
         String safe=list.get(0).getSafepwd();
-        if(!safepwd.equals(MD5Util.MD5(safe)) || tokennum<Integer.parseInt(num)){
+        if(!safe.equals(MD5Util.MD5(safepwd)) || tokennum<Integer.parseInt(num)){
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }

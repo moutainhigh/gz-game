@@ -17,8 +17,23 @@ public class MessageVO {
 	private String content;
 	private String userid;
 	private String username;
+	private String account;
+	private String telephone;
 	private Date create_date;
 	private Date lastup_date;
+	
+	public String getAccount() {
+		return account;
+	}
+	public void setAccount(String account) {
+		this.account = account;
+	}
+	public String getTelephone() {
+		return telephone;
+	}
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
 	public Integer getId() {
 		return id;
 	}

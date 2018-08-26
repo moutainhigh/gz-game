@@ -109,10 +109,21 @@
 			<if test="account != null">
 				and account=#{account}
 			</if>
-			<if test="password != null">
-				and password=#{password}
-			</if>
 		</where>
 	</update>
+ 
+ <update id="gaveToken">
+		UPDATE gm_user_t  
+		set task_token=task_token+#{taskToken}
+		<where>
+			<if test="id != null">
+				and id=#{id}
+			</if>
+			<if test="account != null">
+				and account=#{account}
+			</if>
+		</where>
+ </update>
+ 
  
 </mapper>

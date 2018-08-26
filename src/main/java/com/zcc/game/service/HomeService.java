@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zcc.game.common.OpenDataJob;
 import com.zcc.game.common.OrderJob;
 import com.zcc.game.common.QuartzJobUtils;
 import com.zcc.game.mapper.HomeMapper;
@@ -125,7 +126,7 @@ public class HomeService {
 	        jobDataMap.put("HomeService", this);
 	        
 	        //获取后台参数
-	        QuartzJobUtils.addJob("CANCEL_ORDER_"+business.getId(), OrderJob.class, getCronExpressionByFixTime(60), jobDataMap);
+	        QuartzJobUtils.addJob("CANCEL_ORDER_"+business.getId(), OrderJob.class, getCronExpressionByFixTime(60*60*24), jobDataMap);
 		}
 		return homeMapper.updateBusiness(business);
 	}
@@ -142,8 +143,17 @@ public class HomeService {
 	}
 	
 	//开奖信息
-	public int addData(DataVO task){
-		return homeMapper.addData(task);
+	public int addData(DataVO task) throws Exception{
+		int num = homeMapper.addData(task);
+		if(num>0){
+			JobDataMap jobDataMap = new JobDataMap();
+	        jobDataMap.put("gmnum", task.getGmnum());
+	        jobDataMap.put("HomeService", this);
+	        
+	        //获取后台参数
+	        QuartzJobUtils.addJob("CANCEL_DATA_"+task.getGmnum(), OpenDataJob.class, getCronExpressionByFixTime(60), jobDataMap);
+		}
+		return num;
 	}
 	public List<DataVO> getData(DataVO data){
 		return homeMapper.getData(data);

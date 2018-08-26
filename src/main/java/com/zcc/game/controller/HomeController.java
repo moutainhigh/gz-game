@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.zcc.game.common.OrderJob;
 import com.zcc.game.common.QuartzJobUtils;
 import com.zcc.game.common.SysCode;
-import com.zcc.game.mq.RabbitMQSender;
+//import com.zcc.game.mq.RabbitMQSender;
 import com.zcc.game.service.HomeService;
 import com.zcc.game.service.UserService;
 import com.zcc.game.utils.DateUtil;
@@ -41,8 +41,8 @@ public class HomeController extends BaseController{
 	@Autowired
 	private UserService userService;
 	
-	@Autowired
-	private RabbitMQSender rabbitMQSender;
+//	@Autowired
+//	private RabbitMQSender rabbitMQSender;
 	
 	//获取公告
 	@RequestMapping("/getNotice")
@@ -203,16 +203,16 @@ public class HomeController extends BaseController{
 	//获取任务信息
 	@RequestMapping("/getTask")
 	public void getTask(HttpServletRequest request,HttpServletResponse response){
-		String[] paramKey = {"id"};
+		String[] paramKey = {"userId"};
 		Map<String, String> params = parseParams(request, "getTask", paramKey);
-        String id = params.get("id"); 
-        if(StringUtils.isBlank(id) ){//
+        String userId = params.get("userId"); 
+        if(StringUtils.isBlank(userId) ){//
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
         
         TaskVO task = new TaskVO();
-        task.setId(Integer.parseInt(id));
+        task.setUserid(userId);
         try {
 	        //获取挂卖信息
 	    	List<TaskVO> result = homeService.getTask(task);
@@ -227,17 +227,17 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
-	//增添任务信息
+	//增添任务信息,消耗一条秘钥
 	@RequestMapping("/addTask")
 	public void addTask(HttpServletRequest request,HttpServletResponse response){
 		
 		String[] paramKey = {"title","status","userid"};
 		Map<String, String> params = parseParams(request, "addTask", paramKey);
-		String status = params.get("status"); 
+		String status = "1"; 
 		String userid = params.get("userid"); 
 		String title = params.get("title"); 
 		
-		if(StringUtils.isBlank(title) || StringUtils.isBlank(userid) || StringUtils.isBlank(status)){//userID不能为空
+		if( StringUtils.isBlank(userid) ){//userID不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
@@ -301,7 +301,7 @@ public class HomeController extends BaseController{
 		String gm5 = params.get("gm5"); 
 		
 		if(StringUtils.isBlank(gmnum) || StringUtils.isBlank(gm1) || StringUtils.isBlank(gm2)
-				|| StringUtils.isBlank(gm3) || StringUtils.isBlank(gm4)|| StringUtils.isBlank(gm4)){
+				|| StringUtils.isBlank(gm3) || StringUtils.isBlank(gm4)|| StringUtils.isBlank(gm5)){
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
@@ -318,7 +318,7 @@ public class HomeController extends BaseController{
 	        //添加任务
 	    	int result = homeService.addData(data);
 	    	if(result ==1){
-	    		rabbitMQSender.send("test-queue",data.getGmnum());
+//	    		rabbitMQSender.send("test-queue",data.getGmnum());
 	    		renderJson(request, response, SysCode.SUCCESS, result);
 			}else{
 				renderJson(request, response, SysCode.SUCCESS, result);
@@ -369,9 +369,9 @@ public class HomeController extends BaseController{
 	@RequestMapping("/addPool")
 	public void addPool(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"userid","jf","type","gmnum","count"};
+		String[] paramKey = {"userId","jf","type","gmnum","count"};
 		Map<String, String> params = parseParams(request, "addPool", paramKey);
-		String userid = params.get("userid"); 
+		String userid = params.get("userId"); 
 		String jf = params.get("jf"); 
 		String type = params.get("type"); 
 		String gmnum = params.get("gmnum"); 
@@ -422,9 +422,10 @@ public class HomeController extends BaseController{
 	@RequestMapping("/getPools")
 	public void getPools(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"userid"};
+		String[] paramKey = {"userId","status"};
 		Map<String, String> params = parseParams(request, "getPools", paramKey);
-		String userid = params.get("userid"); 
+		String userid = params.get("userId"); 
+		String status = params.get("status"); 
 		
 		if(StringUtils.isBlank(userid) ){
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
@@ -433,6 +434,7 @@ public class HomeController extends BaseController{
 		
 		PoolVO pool=new PoolVO();
 		pool.setUserid(userid);
+		pool.setStatus(status);
         try {
 	        //获取开奖数据
 	    	List<PoolVO> result = homeService.getPools(pool);
@@ -452,9 +454,9 @@ public class HomeController extends BaseController{
 	@RequestMapping("/addMessage")
 	public void addMessage(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"userid","content"};
+		String[] paramKey = {"userId","content"};
 		Map<String, String> params = parseParams(request, "addMessage", paramKey);
-		String userid = params.get("userid"); 
+		String userid = params.get("userId"); 
 		String content = params.get("content"); 
 		
 		if(StringUtils.isBlank(userid) ||StringUtils.isBlank(content)){
@@ -479,9 +481,9 @@ public class HomeController extends BaseController{
 	@RequestMapping("/getMessages")
 	public void getMessages(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"userid"};
+		String[] paramKey = {"userId"};
 		Map<String, String> params = parseParams(request, "getMessages", paramKey);
-		String userid = params.get("userid"); 
+		String userid = params.get("userId"); 
 		
 		if(StringUtils.isBlank(userid) ){
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
@@ -560,9 +562,9 @@ public class HomeController extends BaseController{
 	@RequestMapping("/getTokens")
 	public void getTokens(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"userid","account"};
+		String[] paramKey = {"userId","account"};
 		Map<String, String> params = parseParams(request, "getTokens", paramKey);
-		String userid = params.get("userid"); 
+		String userid = params.get("userId"); 
 		String account = params.get("account"); 
 		
 		if(StringUtils.isBlank(userid) && StringUtils.isBlank(account)){

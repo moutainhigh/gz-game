@@ -33,9 +33,9 @@ public class JfController extends BaseController{
         String userId = params.get("userId"); 
         String type = params.get("type"); //1(注册->中心),2(注册->交易),3(注册->任务),4(中心->交易),5(中心->任务)
         String jf = params.get("jf"); 
-        String version = params.get("version"); 
+//        String version = params.get("version"); 
         if(StringUtils.isBlank(userId) || StringUtils.isBlank(type) 
-        		||StringUtils.isBlank(jf) ||StringUtils.isBlank(version)){//userID不能为空
+        		||StringUtils.isBlank(jf) ){//userID不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
@@ -43,7 +43,7 @@ public class JfController extends BaseController{
         UserVO user=new UserVO();
         user.setId(Integer.parseInt(userId));
         List<UserVO> users = userService.getUsers(user);
-        if(users==null || users.size()<=0 ||users.get(0).getVersion()!=Integer.parseInt(version)){
+        if(users==null || users.size()<=0 ){
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
@@ -67,7 +67,7 @@ public class JfController extends BaseController{
         	user.setJfcenter(-Integer.parseInt(jf));
         	user.setJftask(Integer.parseInt(jf));
         }
-        user.setVersion(Integer.parseInt(version)+1);
+//        user.setVersion(Integer.parseInt(version)+1);
         int result =0;
         try {
 	        //更新
