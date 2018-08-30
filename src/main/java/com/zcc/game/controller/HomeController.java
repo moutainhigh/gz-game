@@ -1,7 +1,5 @@
 package com.zcc.game.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -10,13 +8,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.quartz.JobDataMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.zcc.game.common.OrderJob;
-import com.zcc.game.common.QuartzJobUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zcc.game.common.HttpRequest;
 import com.zcc.game.common.SysCode;
 //import com.zcc.game.mq.RabbitMQSender;
 import com.zcc.game.service.HomeService;
@@ -31,6 +30,7 @@ import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.TaskVO;
 import com.zcc.game.vo.TokenVO;
 import com.zcc.game.vo.UserVO;
+import com.zcc.game.vo.base.OpenData;
 
 @Controller
 @RequestMapping("/home")
@@ -43,7 +43,18 @@ public class HomeController extends BaseController{
 	
 //	@Autowired
 //	private RabbitMQSender rabbitMQSender;
-	
+	//获取公告
+	@RequestMapping("/test")
+	public void test(HttpServletRequest request,HttpServletResponse response){
+		String resul=HttpRequest.sendGet("http://ho.apiplus.net/newly.do?token=tf5d11ebbf5a9a989k&code=cqssc&rows=1&format=json");
+		System.out.println(resul);
+		JSONObject obj=JSONObject.parseObject(resul);
+		List<OpenData> list = JSONObject.parseArray(obj.get("data").toString(),OpenData.class);
+		for (int i = 0; i < list.size(); i++) {
+			System.out.println(list.get(i).getExpect());
+		}
+	}
+		
 	//获取公告
 	@RequestMapping("/getNotice")
 	public void getNotice(HttpServletRequest request,HttpServletResponse response){
@@ -288,83 +299,47 @@ public class HomeController extends BaseController{
 		}
 	}
 	//增添开奖信息
-	@RequestMapping("/addData")
-	public void addData(HttpServletRequest request,HttpServletResponse response){
-		
-		String[] paramKey = {"gmnum","gm1","gm2","gm3","gm4","gm5"};
-		Map<String, String> params = parseParams(request, "addData", paramKey);
-		String gmnum = params.get("gmnum"); 
-		String gm1 = params.get("gm1"); 
-		String gm2 = params.get("gm2"); 
-		String gm3 = params.get("gm3"); 
-		String gm4 = params.get("gm4"); 
-		String gm5 = params.get("gm5"); 
-		
-		if(StringUtils.isBlank(gmnum) || StringUtils.isBlank(gm1) || StringUtils.isBlank(gm2)
-				|| StringUtils.isBlank(gm3) || StringUtils.isBlank(gm4)|| StringUtils.isBlank(gm5)){
-        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
-        	return;
-        }
-        DataVO data = new DataVO();
-        data.setGmnum(gmnum);
-        data.setGm1(gm1);
-        data.setGm2(gm2);
-        data.setGm3(gm3);
-        data.setGm4(gm4);
-        data.setGm5(gm5);
-        getDataInfo(data);
-        //验证今日未赢过，
-        try {
-	        //添加任务
-	    	int result = homeService.addData(data);
-	    	if(result ==1){
-//	    		rabbitMQSender.send("test-queue",data.getGmnum());
-	    		renderJson(request, response, SysCode.SUCCESS, result);
-			}else{
-				renderJson(request, response, SysCode.SUCCESS, result);
-			}
-        } catch (Exception e) {
-        	e.printStackTrace();
-        	logger.info("`````method``````addData()`````"+e.getMessage());
-			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
-		}
-	}	
-	private void getDataInfo(DataVO data){
-		int gm1=Integer.parseInt(data.getGm1());
-		int gm2=Integer.parseInt(data.getGm2());
-		int gm3=Integer.parseInt(data.getGm3());
-		int gm4=Integer.parseInt(data.getGm4());
-		int gm5=Integer.parseInt(data.getGm5());
-		int gmsum=gm1+gm2+gm3+gm4+gm5;
-		data.setGmsum(gmsum+"");//总和
-		data.setBgm1(isBig(gm1));
-		data.setBgm2(isBig(gm2));
-		data.setBgm3(isBig(gm3));
-		data.setBgm4(isBig(gm4));
-		data.setBgm5(isBig(gm5));
-		data.setBgmsum(isBig(gmsum));
-		data.setSgm1(isSign(gm1));
-		data.setSgm2(isSign(gm2));
-		data.setSgm3(isSign(gm3));
-		data.setSgm4(isSign(gm4));
-		data.setSgm5(isSign(gm5));
-		data.setSgmsum(isSign(gmsum));
-	}
-	private String isBig(int num){
-		if(num>4){
-			return "大";
-		}else{
-			return "小";
-		}
-	}
-	private String isSign(int num){
-		if(num%2==0){
-			return "双";
-		}else{
-			return "单";
-		}
-	}
-	
+//	@RequestMapping("/addData")
+//	public void addData(HttpServletRequest request,HttpServletResponse response){
+//		
+//		String[] paramKey = {"gmnum","gm1","gm2","gm3","gm4","gm5"};
+//		Map<String, String> params = parseParams(request, "addData", paramKey);
+//		String gmnum = params.get("gmnum"); 
+//		String gm1 = params.get("gm1"); 
+//		String gm2 = params.get("gm2"); 
+//		String gm3 = params.get("gm3"); 
+//		String gm4 = params.get("gm4"); 
+//		String gm5 = params.get("gm5"); 
+//		
+//		if(StringUtils.isBlank(gmnum) || StringUtils.isBlank(gm1) || StringUtils.isBlank(gm2)
+//				|| StringUtils.isBlank(gm3) || StringUtils.isBlank(gm4)|| StringUtils.isBlank(gm5)){
+//        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+//        	return;
+//        }
+//        DataVO data = new DataVO();
+//        data.setGmnum(gmnum);
+//        data.setGm1(gm1);
+//        data.setGm2(gm2);
+//        data.setGm3(gm3);
+//        data.setGm4(gm4);
+//        data.setGm5(gm5);
+////        getDataInfo(data);
+//        //验证今日未赢过，
+//        try {
+//	        //添加任务
+//	    	int result = homeService.addData(data);
+//	    	if(result ==1){
+////	    		rabbitMQSender.send("test-queue",data.getGmnum());
+//	    		renderJson(request, response, SysCode.SUCCESS, result);
+//			}else{
+//				renderJson(request, response, SysCode.SUCCESS, result);
+//			}
+//        } catch (Exception e) {
+//        	e.printStackTrace();
+//        	logger.info("`````method``````addData()`````"+e.getMessage());
+//			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+//		}
+//	}	
 	//增添下注信息
 	@RequestMapping("/addPool")
 	public void addPool(HttpServletRequest request,HttpServletResponse response){

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONObject;
+import com.zcc.game.common.HttpRequest;
 import com.zcc.game.common.OpenDataJob;
 import com.zcc.game.common.OrderJob;
 import com.zcc.game.common.QuartzJobUtils;
@@ -23,6 +25,7 @@ import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.TaskVO;
 import com.zcc.game.vo.TokenVO;
 import com.zcc.game.vo.UserVO;
+import com.zcc.game.vo.base.OpenData;
 
 @Service
 public class HomeService {
@@ -156,8 +159,36 @@ public class HomeService {
 		return num;
 	}
 	public List<DataVO> getData(DataVO data){
+		taskData();
 		return homeMapper.getData(data);
 	}
+	
+	public void taskData(){
+		String resul=HttpRequest.sendGet("http://ho.apiplus.net/newly.do?token=tf5d11ebbf5a9a989k&code=cqssc&rows=1&format=json");
+		JSONObject obj=JSONObject.parseObject(resul);
+		List<OpenData> list = JSONObject.parseArray(obj.get("data").toString(),OpenData.class);
+		if(list.size()<=0){
+			return ;
+		}
+		OpenData openData=list.get(0);//最新一期开奖
+		String num=openData.getExpect();//期号
+		String code=openData.getOpencode();//开奖结果
+//		String time=openData.getOpentime();
+		DataVO vo=new DataVO();
+		String strData []=code.split(",");
+		vo.setGmnum(num);
+		vo.setGm1(strData[0]);
+		vo.setGm2(strData[1]);
+		vo.setGm3(strData[2]);
+		vo.setGm4(strData[3]);
+		vo.setGm5(strData[4]);
+		getDataInfo(vo);
+		List<DataVO> dataList = homeMapper.getData(vo);
+		if(dataList==null || dataList.size()<=0){
+			homeMapper.addData(vo);
+		}
+	}
+	
 	@Transactional
 	public int addPool(PoolVO pool){
 		return homeMapper.addPool(pool);
@@ -248,5 +279,46 @@ public class HomeService {
 		}
 		return result;
 	}
-	
+	private void getDataInfo(DataVO data){
+		int gm1=Integer.parseInt(data.getGm1());
+		int gm2=Integer.parseInt(data.getGm2());
+		int gm3=Integer.parseInt(data.getGm3());
+		int gm4=Integer.parseInt(data.getGm4());
+		int gm5=Integer.parseInt(data.getGm5());
+		int gmsum=gm1+gm2+gm3+gm4+gm5;
+		data.setGmsum(gmsum+"");//总和
+		data.setBgm1(isBig(gm1));
+		data.setBgm2(isBig(gm2));
+		data.setBgm3(isBig(gm3));
+		data.setBgm4(isBig(gm4));
+		data.setBgm5(isBig(gm5));
+		data.setBgmsum(isSumBig(gmsum));
+		data.setSgm1(isSign(gm1));
+		data.setSgm2(isSign(gm2));
+		data.setSgm3(isSign(gm3));
+		data.setSgm4(isSign(gm4));
+		data.setSgm5(isSign(gm5));
+		data.setSgmsum(isSign(gmsum));
+	}
+	private String isSumBig(int num){
+		if(num>22){
+			return "大";
+		}else{
+			return "小";
+		}
+	}
+	private String isBig(int num){
+		if(num>4){
+			return "大";
+		}else{
+			return "小";
+		}
+	}
+	private String isSign(int num){
+		if(num%2==0){
+			return "双";
+		}else{
+			return "单";
+		}
+	}
 }
