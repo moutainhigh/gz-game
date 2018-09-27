@@ -49,23 +49,24 @@ public class JfController extends BaseController{
         }
         
         //比较数据version是否最新
-        int zhuce = users.get(0).getJfzhuce();
+        int zhuce = users.get(0).getJfzhuce()-users.get(0).getJfDiya();
         int center = users.get(0).getJfcenter();
-        if("1".equals(type) && Integer.parseInt(jf)<=zhuce){//(注册->中心)
-        	user.setJfzhuce(-Integer.parseInt(jf));
-        	user.setJfcenter(Integer.parseInt(jf));
-        }else if("2".equals(type) && Integer.parseInt(jf)<=zhuce){//(注册->交易)
-        	user.setJfzhuce(-Integer.parseInt(jf));
-        	user.setJfbusiness(Integer.parseInt(jf));
-        }else if("3".equals(type) && Integer.parseInt(jf)<=zhuce){//(注册->任务)
-        	user.setJfzhuce(-Integer.parseInt(jf));
-        	user.setJftask(Integer.parseInt(jf));
-        }else if("4".equals(type) && Integer.parseInt(jf)<=center){//(中心->交易)
-        	user.setJfzhuce(-Integer.parseInt(jf));
-        	user.setJfcenter(Integer.parseInt(jf));
-        }else if("5".equals(type) && Integer.parseInt(jf)<=center){//(中心->任务)
-        	user.setJfcenter(-Integer.parseInt(jf));
-        	user.setJftask(Integer.parseInt(jf));
+        int jfrale=Integer.parseInt(jf)*100;
+        if("1".equals(type) && jfrale<=zhuce){//(注册->中心)
+        	user.setJfzhuce(-jfrale);
+        	user.setJfcenter(jfrale);
+        }else if("2".equals(type) && jfrale<=zhuce){//(注册->交易)
+        	user.setJfzhuce(-jfrale);
+        	user.setJfbusiness(jfrale);
+        }else if("3".equals(type) && jfrale<=zhuce){//(注册->任务)
+        	user.setJfzhuce(-jfrale);
+        	user.setJftask(jfrale);
+        }else if("4".equals(type) && jfrale<=center){//(中心->交易)
+        	user.setJfcenter(-jfrale);
+        	user.setJfbusiness(jfrale);
+        }else if("5".equals(type) && jfrale<=center){//(中心->任务)
+        	user.setJfcenter(-jfrale);
+        	user.setJftask(jfrale);
         }
 //        user.setVersion(Integer.parseInt(version)+1);
         int result =0;

@@ -135,7 +135,14 @@ public class HomeService {
 	}
 	
 	//任务信息
+	@Transactional
 	public int addTask(TaskVO task){
+		if(task.getStatus().equals("2")){//审批通过
+			UserVO user=new UserVO();
+			user.setId(Integer.parseInt(task.getUserid()));
+			user.setVersion(Integer.parseInt(task.getTaskjf()));
+			userMapper.updateUser(user);
+		}
 		return homeMapper.addTask(task);
 	}
 	public int updateTask(TaskVO task){

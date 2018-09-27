@@ -26,6 +26,7 @@ import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.DataVO;
 import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
+import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.TaskVO;
 import com.zcc.game.vo.TokenVO;
@@ -252,12 +253,33 @@ public class HomeController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
+		//验证是否还有足够的秘钥
+		UserVO user =new UserVO();
+		user.setId(Integer.parseInt(userid));
+		List<UserVO> users = userService.getUsers(user);
+		if(users==null && users.size()<=0){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "用户无效");
+        	return;
+		}
+		int taskNum =users.get(0).getTaskToken();
+		if(taskNum<=0){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "秘钥不足");
+        	return;
+		}
+		//是否自动审批通过
+		ParamVO param =new ParamVO();
+		param.setNumber("004");
+		param = userService.getParam(param);
+		if("1".equals(param.getAuto())){//0手动、1自动
+			status="2";//审批通过
+		}
         TaskVO task = new TaskVO();
         task.setUserid(userid);
         task.setStatus(status);
         task.setTitle(title);
-        task.setTaskjf("100");//后台设置
+        task.setTaskjf(param.getData());//后台设置
         //验证今日未赢过，
+        
         try {
 	        //添加任务
 	    	int result = homeService.addTask(task);
@@ -276,13 +298,13 @@ public class HomeController extends BaseController{
 	@RequestMapping("/getData")
 	public void getData(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"gmnum","id"};
+		String[] paramKey = {"gmnum"};
 		Map<String, String> params = parseParams(request, "addTask", paramKey);
-		String id = params.get("id"); 
+//		String id = params.get("id"); 
 		String gmnum = params.get("gmnum"); 
 		
 		DataVO data=new DataVO();
-		data.setId(Integer.parseInt(id));
+//		data.setId(Integer.parseInt(id));
 		data.setGmnum(gmnum);
         try {
 	        //获取开奖数据

@@ -124,6 +124,9 @@
 			</if>
 		</where>
  </update>
- 
+ <select id="getParam" resultType="com.zcc.game.vo.ParamVO">
+ 	SELECT * FROM gm_backparam_t 
+ 	where number=#{number}
+ </select>
  
 </mapper>

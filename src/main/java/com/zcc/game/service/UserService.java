@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zcc.game.mapper.UserMapper;
+import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.UserVO;
 
 /**
@@ -55,4 +56,9 @@ public class UserService {
 		}
 		return false;
 	}
+	
+	public ParamVO getParam(ParamVO param){
+		return userMapper.getParam(param);
+	}
+	
 }

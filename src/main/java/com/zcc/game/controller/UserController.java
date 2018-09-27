@@ -25,6 +25,7 @@ import com.zcc.game.common.UploadType;
 import com.zcc.game.service.ImageService;
 import com.zcc.game.service.UserService;
 import com.zcc.game.utils.MD5Util;
+import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.UserVO;
 
 /**
@@ -41,7 +42,12 @@ public class UserController extends BaseController{
 	@Autowired
 	private ImageService imageService;
 	
-	
+	public void changeData(UserVO user){
+		user.setJfbusiness(user.getJfbusiness()/100);
+		user.setJfcenter(user.getJfcenter()/100);
+		user.setJftask(user.getJftask()/100);
+		user.setJfzhuce(user.getJfzhuce()/100);
+	}
 	@RequestMapping("/getUsers")
 //	@ResponseBody
 	public void getUsers(HttpServletRequest request,HttpServletResponse response){
@@ -60,7 +66,7 @@ public class UserController extends BaseController{
 //			 Map<Class<?>, String[]> includes=CommonUtil.getObjectIncludes(UserVO.class,
 //		        		new String[]{"i","userTelephone","userName","userSex","userEmail","userFish",
 //		        	"userGold","gameType","gameLeave","userLeave","nameChangeDate","emailChangeDate","userToken","userHeadIcm","shopId","shopName"});
-		    	
+		    changeData(users.get(0));	
 	        if(users.size()>0){
 	        	renderJson(request, response, SysCode.SUCCESS, users.get(0));
 	        }else{
@@ -152,17 +158,25 @@ public class UserController extends BaseController{
         
         UserVO userVO = new UserVO();
         userVO.setAccount(account);
+        
         //检查该手机号是否已经注册过
       	try {
 			if(userService.isExistUser(userVO)){
 				renderJson(request, response, SysCode.USER_IS_REGISTE, null);//用户名已注册
 				return;
 			}
+			ParamVO param=new ParamVO();
+			param.setNumber("002");//注册积分抵押
+			param = userService.getParam(param);
+			int num=0;
+			if(param.getData()!=null){
+				num=Integer.parseInt(param.getData());
+			}
 			userVO.setPassword(MD5Util.MD5(password));
 			userVO.setSafepwd(MD5Util.MD5(safepwd));
 			userVO.setJfzhuce(Integer.parseInt(jfzhuce)*100);
 			userVO.setJfold(jfzhuce);
-			userVO.setJfDiya(Integer.parseInt(jfzhuce)*50);
+			userVO.setJfDiya(Integer.parseInt(jfzhuce)*num);
 			userVO.setPid(Integer.parseInt(pid));
 			
 	        //注册

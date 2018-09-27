@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.UserVO;
 
 /**
@@ -25,6 +26,6 @@ public interface UserMapper {
 	public int gaveToken(UserVO user);
 	
 
-	
+	public ParamVO getParam(ParamVO param);
 	
 }
