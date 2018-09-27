@@ -135,7 +135,7 @@ public class HomeController extends BaseController{
         int businessjf=users.get(0).getJfbusiness();
         int pretake=users.get(0).getPretake();//预扣减
     	String pwd=users.get(0).getSafepwd();
-    	if(businessjf-pretake<Integer.parseInt(selljf) || !MD5Util.MD5(safepwd).equals(pwd)){
+    	if(businessjf-pretake<Integer.parseInt(selljf)*100 || !MD5Util.MD5(safepwd).equals(pwd)){
     		renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足或密码错误");
         	return;
     	}
@@ -188,7 +188,7 @@ public class HomeController extends BaseController{
 	        	return;
 	        }
 	    	String pwd=users.get(0).getSafepwd();
-	    	if(!MD5Util.MD5(pwd).equals(safepwd)){
+	    	if(!MD5Util.MD5(safepwd).equals(pwd)){
 	    		renderJson(request, response, SysCode.PARAM_IS_ERROR, "密码错误");
 	        	return;
 	    	}

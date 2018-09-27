@@ -65,6 +65,7 @@ public class JfController extends BaseController{
         	if(users.get(0).getVersion()>0 && users.get(0).getVersion()==Integer.parseInt(jf)){
         		user.setJfzhuce(-jfrale);
             	user.setJftask(jfrale);
+            	user.setVersion(0);
         	}else{
         		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
             	return;
@@ -77,6 +78,7 @@ public class JfController extends BaseController{
         	if(users.get(0).getVersion()>0 && users.get(0).getVersion()==Integer.parseInt(jf)){
         		user.setJfcenter(-jfrale);
             	user.setJftask(jfrale);
+            	user.setVersion(0);
         	}else{
         		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
             	return;

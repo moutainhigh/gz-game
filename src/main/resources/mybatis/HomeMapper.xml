@@ -41,7 +41,7 @@
 	(SELECT weixinpic FROM gm_user_t WHERE id=#{userid}),
 	(SELECT alipaypic FROM gm_user_t WHERE id=#{userid}),
 	#{selljf},1,now());
-	update gm_user_t set pretake=pretake+#{selljf} where id=#{userid}
+	update gm_user_t set pretake=pretake+#{selljf}*100 where id=#{userid}
  </insert> 
  <!-- 更新挂卖信息 -->
  <update id="updateBusiness">
@@ -77,7 +77,7 @@
  	VALUES (#{title},#{status},#{taskjf},#{userid},
  	(SELECT account FROM gm_user_t WHERE id=#{userid}),
  	now());
- 	update gm_user_t set task_token=task_token-1 where id=#{userid}
+ 	update gm_user_t set task_token=task_token-1,usedtoken=usedtoken+1 where id=#{userid}
  </insert> 
  <!-- 更新任务信息 -->
  <update id="updateTask">
@@ -112,7 +112,7 @@
  			and id=#{id}
  		</if>
  	</where>
- 	order by id desc LIMIT 1
+ 	order by id desc LIMIT 10
  </select>
  <!-- 添加开奖信息 -->
  <insert id="addData">
