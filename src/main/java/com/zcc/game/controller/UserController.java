@@ -172,6 +172,15 @@ public class UserController extends BaseController{
 			if(param.getData()!=null){
 				num=Integer.parseInt(param.getData());
 			}
+			//判断父类积分是否够扣减
+			UserVO parent = new UserVO();
+			parent.setId(Integer.parseInt(pid));
+			List<UserVO> list = userService.getUsers(parent);
+	        if(list==null || list.size()<=0 || list.get(0).getJfcenter()<Integer.parseInt(jfzhuce)*100){
+	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足");//用户名已注册
+				return;
+	        }
+	        
 			userVO.setPassword(MD5Util.MD5(password));
 			userVO.setSafepwd(MD5Util.MD5(safepwd));
 			userVO.setJfzhuce(Integer.parseInt(jfzhuce)*100);
@@ -192,22 +201,31 @@ public class UserController extends BaseController{
 //	@ResponseBody
 	public void updateUser(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"userVO"};
+		String[] paramKey = {"userId","username","telephone","banknum","bankname"};
         Map<String, String> params = parseParams(request, "updateUser", paramKey);
         
-        String userVO = params.get("userVO"); 
-        UserVO user=JSON.parseObject(userVO, UserVO.class);
-        String userId=user.getId()+"";
+        String userId = params.get("userId"); 
+        String username = params.get("username"); 
+        String telephone = params.get("telephone"); 
+        String banknum = params.get("banknum"); 
+        String bankname = params.get("bankname"); 
+//        String password = params.get("password"); 
+//        String safepwd = params.get("safepwd"); 
         if(StringUtils.isBlank(userId)){//shopId,userID不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
-        if(null != user.getPassword() && !"".equals(user.getPassword())){//修改密码
-        	user.setPassword(MD5Util.MD5(user.getPassword()));
+        UserVO user =new UserVO();
+        user.setId(Integer.parseInt(userId));
+        List<UserVO> users = userService.getUsers(user);
+        if(users == null || users.size()<=0){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "没有该用户");
+        	return;
         }
-        if(null != user.getSafepwd() && !"".equals(user.getSafepwd())){//修改安全码
-        	user.setSafepwd(MD5Util.MD5(user.getSafepwd()));
-        }
+        user.setTelephone(telephone);
+        user.setBankName(bankname);
+        user.setBankNum(banknum);
+        user.setUsername(username);
         int result =0;
         try {
 	        //更新

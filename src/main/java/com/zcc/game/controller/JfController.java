@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.zcc.game.common.SysCode;
 import com.zcc.game.service.UserService;
+import com.zcc.game.vo.NoticeVO;
+import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.UserVO;
 
 @Controller
@@ -59,14 +61,29 @@ public class JfController extends BaseController{
         	user.setJfzhuce(-jfrale);
         	user.setJfbusiness(jfrale);
         }else if("3".equals(type) && jfrale<=zhuce){//(注册->任务)
-        	user.setJfzhuce(-jfrale);
-        	user.setJftask(jfrale);
+        	//要有预申请的任务积分
+        	if(users.get(0).getVersion()>0 && users.get(0).getVersion()==Integer.parseInt(jf)){
+        		user.setJfzhuce(-jfrale);
+            	user.setJftask(jfrale);
+        	}else{
+        		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+            	return;
+        	}
         }else if("4".equals(type) && jfrale<=center){//(中心->交易)
         	user.setJfcenter(-jfrale);
         	user.setJfbusiness(jfrale);
         }else if("5".equals(type) && jfrale<=center){//(中心->任务)
-        	user.setJfcenter(-jfrale);
-        	user.setJftask(jfrale);
+        	//要有预申请的任务积分
+        	if(users.get(0).getVersion()>0 && users.get(0).getVersion()==Integer.parseInt(jf)){
+        		user.setJfcenter(-jfrale);
+            	user.setJftask(jfrale);
+        	}else{
+        		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+            	return;
+        	}
+        }else{
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足或参数错误");
+        	return;
         }
 //        user.setVersion(Integer.parseInt(version)+1);
         int result =0;
@@ -85,4 +102,34 @@ public class JfController extends BaseController{
 		}
 	}
 	
+	//获取系统参数
+	@RequestMapping("/getJf")
+	public void getJf(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"number"};
+        Map<String, String> params = parseParams(request, "getJf", paramKey);
+        
+        String number = params.get("number"); //001 注册积分,002 抵押比例,003 赔率,004 任务积分,005 返还积分
+        if(StringUtils.isBlank(number)){//number不能为空
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+        
+        ParamVO param=new ParamVO();
+        param.setNumber(number);
+        
+        try {
+	        //获取前五条公告数据
+	    	ParamVO result = userService.getParam(param);
+	    	if(result !=null){
+	    		renderJson(request, response, SysCode.SUCCESS, result);
+			}else{
+				renderJson(request, response, SysCode.SUCCESS, result);
+			}
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getNotice()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
 }
