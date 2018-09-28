@@ -25,26 +25,20 @@ public class UserVO {
 	private String bankNum;
 	private String bankName;
 	private String status;
-	private String jfcenter;
-	private String jftask;
-	private String jfbusiness;
-	private String jfzhuce;
-	private Integer jfDiya;
+	private Double jfcenter;
+	private Double jftask;
+	private Double jfbusiness;
+	private Double jfzhuce;
+	private Double jfDiya;
 	private Integer taskToken;
 	private Integer usedtoken;
-	private Integer version;
+	private Double version;
+	private Double pretake;
+	private Double prejftask;
 	private String jfold;
 	private Integer pid;
-	private Integer pretake;
 	private Date createDate;
 	private Date lastupDate;
-	
-	public Integer getPretake() {
-		return pretake;
-	}
-	public void setPretake(Integer pretake) {
-		this.pretake = pretake;
-	}
 	public Integer getId() {
 		return id;
 	}
@@ -105,34 +99,40 @@ public class UserVO {
 	public void setBankName(String bankName) {
 		this.bankName = bankName;
 	}
-	public String getJfcenter() {
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public Double getJfcenter() {
 		return jfcenter;
 	}
-	public void setJfcenter(String jfcenter) {
+	public void setJfcenter(Double jfcenter) {
 		this.jfcenter = jfcenter;
 	}
-	public String getJftask() {
+	public Double getJftask() {
 		return jftask;
 	}
-	public void setJftask(String jftask) {
+	public void setJftask(Double jftask) {
 		this.jftask = jftask;
 	}
-	public String getJfbusiness() {
+	public Double getJfbusiness() {
 		return jfbusiness;
 	}
-	public void setJfbusiness(String jfbusiness) {
+	public void setJfbusiness(Double jfbusiness) {
 		this.jfbusiness = jfbusiness;
 	}
-	public String getJfzhuce() {
+	public Double getJfzhuce() {
 		return jfzhuce;
 	}
-	public void setJfzhuce(String jfzhuce) {
+	public void setJfzhuce(Double jfzhuce) {
 		this.jfzhuce = jfzhuce;
 	}
-	public Integer getJfDiya() {
+	public Double getJfDiya() {
 		return jfDiya;
 	}
-	public void setJfDiya(Integer jfDiya) {
+	public void setJfDiya(Double jfDiya) {
 		this.jfDiya = jfDiya;
 	}
 	public Integer getTaskToken() {
@@ -146,6 +146,30 @@ public class UserVO {
 	}
 	public void setUsedtoken(Integer usedtoken) {
 		this.usedtoken = usedtoken;
+	}
+	public Double getVersion() {
+		return version;
+	}
+	public void setVersion(Double version) {
+		this.version = version;
+	}
+	public Double getPretake() {
+		return pretake;
+	}
+	public void setPretake(Double pretake) {
+		this.pretake = pretake;
+	}
+	public Double getPrejftask() {
+		return prejftask;
+	}
+	public void setPrejftask(Double prejftask) {
+		this.prejftask = prejftask;
+	}
+	public String getJfold() {
+		return jfold;
+	}
+	public void setJfold(String jfold) {
+		this.jfold = jfold;
 	}
 	public Integer getPid() {
 		return pid;
@@ -165,24 +189,9 @@ public class UserVO {
 	public void setLastupDate(Date lastupDate) {
 		this.lastupDate = lastupDate;
 	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	public Integer getVersion() {
-		return version;
-	}
-	public void setVersion(Integer version) {
-		this.version = version;
-	}
-	public String getJfold() {
-		return jfold;
-	}
-	public void setJfold(String jfold) {
-		this.jfold = jfold;
-	}
+	
+	
+	
 	
 	
 }

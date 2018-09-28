@@ -40,6 +40,7 @@
 			and pid=#{id}
 		</if>
  	 </where>
+ 	 order by id desc
  </select>
  <insert id="insertUser">
  	INSERT INTO gm_user_t (account,password,safepwd,jfzhuce,jf_diya,status,pid,jfold,create_date)
@@ -143,6 +144,21 @@
  <select id="getParam" resultType="com.zcc.game.vo.ParamVO">
  	SELECT * FROM gm_backparam_t 
  	where number=#{number}
+ </select>
+ 
+ <insert id="addChangeCenter">
+ 	INSERT INTO gm_changecenter_t (TYPE,STATUS,num,userid,createdate) VALUES(#{type},#{status},#{num},#{userid},now())
+ </insert>
+  <select id="getCenterJf" resultType="com.zcc.game.vo.ChangeCenterVO">
+ 	SELECT * FROM gm_changecenter_t 
+ 	<where>
+			<if test="userid != null">
+				and userid=#{userid}
+			</if>
+			<if test="type != null">
+				and type=#{type}
+			</if>
+		</where>
  </select>
  
 </mapper>

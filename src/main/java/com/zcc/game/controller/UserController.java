@@ -43,16 +43,7 @@ public class UserController extends BaseController{
 	@Autowired
 	private ImageService imageService;
 	
-	public void changeData(UserVO user){
-		double businessjf=new Double(user.getJfbusiness())/100;
-		double centerjf=new Double(user.getJfcenter())/100;
-		double taskjf=new Double(user.getJftask())/100;
-		double zhucejf=new Double(user.getJfzhuce())/100;
-		user.setJfbusiness(businessjf+"");
-		user.setJfcenter(centerjf+"");
-		user.setJftask(taskjf+"");
-		user.setJfzhuce(zhucejf+"");
-	}
+	
 	@RequestMapping("/getUsers")
 //	@ResponseBody
 	public void getUsers(HttpServletRequest request,HttpServletResponse response){
@@ -71,7 +62,6 @@ public class UserController extends BaseController{
 //			 Map<Class<?>, String[]> includes=CommonUtil.getObjectIncludes(UserVO.class,
 //		        		new String[]{"i","userTelephone","userName","userSex","userEmail","userFish",
 //		        	"userGold","gameType","gameLeave","userLeave","nameChangeDate","emailChangeDate","userToken","userHeadIcm","shopId","shopName"});
-		    changeData(users.get(0));	
 	        if(users.size()>0){
 	        	renderJson(request, response, SysCode.SUCCESS, users.get(0));
 	        }else{
@@ -181,17 +171,17 @@ public class UserController extends BaseController{
 			UserVO parent = new UserVO();
 			parent.setId(Integer.parseInt(pid));
 			List<UserVO> list = userService.getUsers(parent);
-	        if(list==null || list.size()<=0 || Integer.parseInt(list.get(0).getJfcenter())<Integer.parseInt(jfzhuce)*100){
+	        if(list==null || list.size()<=0 || list.get(0).getJfcenter()<new Double(jfzhuce)){
 	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足");//用户名已注册
 				return;
 	        }
 	        
 			userVO.setPassword(MD5Util.MD5(password));
 			userVO.setSafepwd(MD5Util.MD5(safepwd));
-			int zhucejf=Integer.parseInt(jfzhuce)*100;
-			userVO.setJfzhuce(zhucejf+"");
+			Double zhucejf=new Double(jfzhuce);
+			userVO.setJfzhuce(zhucejf);
 			userVO.setJfold(jfzhuce);
-			userVO.setJfDiya(Integer.parseInt(jfzhuce)*num);
+			userVO.setJfDiya(new Double(jfzhuce)*num/100);
 			userVO.setPid(Integer.parseInt(pid));
 			
 	        //注册

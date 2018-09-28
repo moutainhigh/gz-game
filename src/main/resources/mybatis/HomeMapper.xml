@@ -41,7 +41,7 @@
 	(SELECT weixinpic FROM gm_user_t WHERE id=#{userid}),
 	(SELECT alipaypic FROM gm_user_t WHERE id=#{userid}),
 	#{selljf},1,now());
-	update gm_user_t set pretake=pretake+#{selljf}*100 where id=#{userid}
+	update gm_user_t set pretake=pretake+#{selljf} where id=#{userid}
  </insert> 
  <!-- 更新挂卖信息 -->
  <update id="updateBusiness">
@@ -128,7 +128,7 @@
  	VALUES (#{userid},#{backjf},
  	(SELECT username FROM gm_user_t WHERE id=#{userid}),
  	#{gmnum},'时时彩',#{jf},0,#{buyinfo},#{winjf},#{getjf},#{count},#{sumjf},now(),now());
- 	update gm_user_t set jftask=jftask-#{jf}*100,lastup_date=#{lastup_date}
+ 	update gm_user_t set jftask=jftask-#{jf},lastup_date=#{lastup_date}
   				where id=#{userid} 
  </insert> 
  <select id="getPools" resultType="com.zcc.game.vo.PoolVO">
@@ -166,17 +166,18 @@
  </update>
  <!-- 添加留言 -->
  <insert id="addMessage">
- 	insert into gm_message_t(content,userid,username,account,telephone,create_date,lastup_date)
+ 	insert into gm_message_t(content,userid,username,account,telephone,create_date)
  	values (#{content},#{userid},
  	(SELECT username FROM gm_user_t WHERE id=#{userid}),
  	(SELECT account FROM gm_user_t WHERE id=#{userid}),
  	(SELECT telephone FROM gm_user_t WHERE id=#{userid}),
- 	now(),now())
+ 	now())
  </insert>
  <!-- 查看留言列表 -->
  <select id="getMessages" resultType="com.zcc.game.vo.MessageVO">
  	select * from gm_message_t
  	where userid=#{userid}
+ 	order by id desc
  </select>
  <!-- 赠送秘钥 -->
  <insert id="addToken">

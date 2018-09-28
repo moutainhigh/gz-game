@@ -138,9 +138,9 @@ public class HomeController extends BaseController{
         	return;
         }
         double businessjf=new Double(users.get(0).getJfbusiness());
-        int pretake=users.get(0).getPretake();//预扣减
+        double pretake=users.get(0).getPretake();//预扣减
     	String pwd=users.get(0).getSafepwd();
-    	if(businessjf-pretake<Integer.parseInt(selljf)*100 || !MD5Util.MD5(safepwd).equals(pwd)){
+    	if(businessjf-pretake<Integer.parseInt(selljf) || !MD5Util.MD5(safepwd).equals(pwd)){
     		renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足或密码错误");
         	return;
     	}
@@ -392,8 +392,8 @@ public class HomeController extends BaseController{
         	return;
 		}
 		
-		double d=new Double(param.getData())*100;
-		double dw=d-100;
+		double d=new Double(param.getData());
+		double dw=d-1;
         PoolVO data = new PoolVO();
         data.setUserid(userid);
         data.setJf(jf);
@@ -415,7 +415,7 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
 		}
-		int peilv=Integer.parseInt(p.getData());
+		Double peilv=new Double(p.getData())/100;
 		double backjf=sum*peilv;
         data.setBackjf(backjf+"");//返还一个积分
         //校验用户有效性和足够的积分。
@@ -463,9 +463,9 @@ public class HomeController extends BaseController{
 	    	List<PoolVO> result = homeService.getPools(pool);
 	    	if(result !=null && result.size()>0){
 	    		for (int i = 0; i < result.size(); i++) {
-	    			double back=new Double(result.get(i).getBackjf())/100;
-	    			double win=new Double(result.get(i).getWinjf())/100;
-	    			double get=new Double(result.get(i).getGetjf())/100;
+	    			double back=new Double(result.get(i).getBackjf());
+	    			double win=new Double(result.get(i).getWinjf());
+	    			double get=new Double(result.get(i).getGetjf());
 	    			result.get(i).setBackjf(back+"");
 	    			result.get(i).setWinjf(win+"");
 	    			result.get(i).setGetjf(get+"");

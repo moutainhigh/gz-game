@@ -18,6 +18,7 @@ import com.zcc.game.common.QuartzJobUtils;
 import com.zcc.game.mapper.HomeMapper;
 import com.zcc.game.mapper.UserMapper;
 import com.zcc.game.vo.BusinessVO;
+import com.zcc.game.vo.ChangeCenterVO;
 import com.zcc.game.vo.DataVO;
 import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
@@ -111,16 +112,16 @@ public class HomeService {
 			tempVO.setStatus("2");
 			List<BusinessVO> list = homeMapper.getBusiness(tempVO);
 			String sellJf=list.get(0).getSelljf();
-			int jf=Integer.parseInt(sellJf)*100;
+			Double jf=new Double(sellJf);
 			String buyerId=list.get(0).getBuyerid();
 			String sellerId=list.get(0).getUserid();
 			UserVO user=new UserVO();
 			user.setId(Integer.parseInt(buyerId));
-			user.setJfcenter(jf+"");
+			user.setJfcenter(jf);
 			userMapper.updateUser(user);//购买人增加积分
 			UserVO user2=new UserVO();
 			user2.setId(Integer.parseInt(sellerId));
-			user2.setJfbusiness(-jf+"");
+			user2.setJfbusiness(-jf);
 			user2.setPretake(-jf);
 			userMapper.updateUser(user2);//卖出人减去积分
 		}else if("2".equals(business.getStatus())){//买家购买，状态变为交易中
@@ -142,7 +143,7 @@ public class HomeService {
 		if(task.getStatus().equals("2")){//审批通过
 			UserVO user=new UserVO();
 			user.setId(Integer.parseInt(task.getUserid()));
-			user.setVersion(Integer.parseInt(task.getTaskjf()));
+			user.setVersion(new Double(task.getTaskjf()));
 			userMapper.updateUser(user);
 		}
 		return homeMapper.addTask(task);
@@ -220,17 +221,32 @@ public class HomeService {
 		if(pools.size()>0){
 			for (PoolVO p:pools) {
 				int num=isWinPrize(p.getBuyinfo(), data);
+				String back="";
 				if(num>0){
 					p.setStatus("1");//中奖
+					double d=new Double(p.getGetjf())+new Double(p.getBackjf());
+					back=d+"";
 				}else{
 					p.setStatus("2");//未中奖
 //					p.setWinjf("0");
 //					p.setGetjf("0");
+					double d=new Double(p.getBackjf());
+					back=d+"";
 				}
 				p.setLastup_date(new Date());
+				addChnageCenter(back,"转入","投注转回",p.getUserid());
 			}
 			homeMapper.updatePools(pools);
 		}
+	}
+	
+	public void addChnageCenter(String num,String type,String status,String userId){
+		ChangeCenterVO ch=new ChangeCenterVO();
+		ch.setNum(num);
+		ch.setStatus(status);
+		ch.setType(type);
+		ch.setUserid(userId);
+		userMapper.addChangeCenter(ch);
 	}
 	
 	public int isWinPrize(String buyInfo,DataVO data){

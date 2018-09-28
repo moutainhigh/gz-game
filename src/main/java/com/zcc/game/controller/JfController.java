@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.zcc.game.common.SysCode;
 import com.zcc.game.service.UserService;
+import com.zcc.game.vo.ChangeCenterVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.UserVO;
@@ -53,36 +54,50 @@ public class JfController extends BaseController{
         //比较数据version是否最新
         double zhuce = new Double(users.get(0).getJfzhuce()) -users.get(0).getJfDiya();
         double center = new Double(users.get(0).getJfcenter());
-        int jfrale=Integer.parseInt(jf)*100;
+        Double jfrale=new Double(jf);
+        //记录中心积分转换日志
+        ChangeCenterVO chnageCenter=new ChangeCenterVO();
         if("1".equals(type) && jfrale<=zhuce){//(注册->中心)
-        	user.setJfzhuce(-jfrale+"");
-        	user.setJfcenter(jfrale+"");
+        	user.setJfzhuce(-jfrale);
+        	user.setJfcenter(jfrale);
+        	chnageCenter.setUserid(userId);
+        	chnageCenter.setNum(jfrale+"");
+        	chnageCenter.setStatus("积分转换");
+        	chnageCenter.setType("转入");
         }else if("2".equals(type) && jfrale<=zhuce){//(注册->交易)
-        	user.setJfzhuce(-jfrale+"");
-        	user.setJfbusiness(jfrale+"");
+        	user.setJfzhuce(-jfrale);
+        	user.setJfbusiness(jfrale);
         }else if("3".equals(type) && jfrale<=zhuce){//(注册->任务)
         	//要有预申请的任务积分
         	if(users.get(0).getVersion()>0 && users.get(0).getVersion()==Integer.parseInt(jf)){
-        		user.setJfzhuce(-jfrale+"");
-            	user.setJftask(jfrale+"");
-            	user.setVersion(0);
+        		user.setJfzhuce(-jfrale);
+            	user.setJftask(jfrale);
+            	user.setVersion(new Double(0));
         	}else{
         		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
             	return;
         	}
         }else if("4".equals(type) && jfrale<=center){//(中心->交易)
-        	user.setJfcenter(-jfrale+"");
-        	user.setJfbusiness(jfrale+"");
+        	user.setJfcenter(-jfrale);
+        	user.setJfbusiness(jfrale);
+        	chnageCenter.setUserid(userId);
+        	chnageCenter.setNum(jfrale+"");
+        	chnageCenter.setStatus("积分转换");
+        	chnageCenter.setType("转出");
         }else if("5".equals(type) && jfrale<=center){//(中心->任务)
         	//要有预申请的任务积分
         	if(users.get(0).getVersion()>0 && users.get(0).getVersion()==Integer.parseInt(jf)){
-        		user.setJfcenter(-jfrale+"");
-            	user.setJftask(jfrale+"");
-            	user.setVersion(0);
+        		user.setJfcenter(-jfrale);
+            	user.setJftask(jfrale);
+            	user.setVersion(new Double(0));
         	}else{
         		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
             	return;
         	}
+        	chnageCenter.setUserid(userId);
+        	chnageCenter.setNum(jfrale+"");
+        	chnageCenter.setStatus("积分转换");
+        	chnageCenter.setType("转出");
         }else{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足或参数错误");
         	return;
@@ -91,7 +106,7 @@ public class JfController extends BaseController{
         int result =0;
         try {
 	        //更新
-	    	result = userService.updateUser(user);
+	    	result = userService.updateUser(user,chnageCenter);
 	    	if(result==1){
 	    		renderJson(request, response, SysCode.SUCCESS, result);
 			}else{
@@ -131,6 +146,37 @@ public class JfController extends BaseController{
         } catch (Exception e) {
         	e.printStackTrace();
         	logger.info("`````method``````getNotice()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+	//获取中心积分报表
+	@RequestMapping("/getCenterJf")
+	public void getCenterJf(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userId","type"};
+        Map<String, String> params = parseParams(request, "getCenterJf", paramKey);
+        
+        String userId = params.get("userId"); //
+        String type = params.get("type"); //0 转入，1 转出
+        if(StringUtils.isBlank(userId)){//userId不能为空
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+        
+        ChangeCenterVO center=new ChangeCenterVO();
+        center.setUserid(userId);
+        if("0".equals(type)){
+        	center.setType("转入");
+        }else if("1".equals(type)){
+        	center.setType("转出");
+        }
+        try {
+	        //获取中心积分报表
+	    	List<ChangeCenterVO> result = userService.getCenterJf(center);
+			renderJson(request, response, SysCode.SUCCESS, result);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getCenterJf()`````"+e.getMessage());
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
