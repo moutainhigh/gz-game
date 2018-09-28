@@ -128,7 +128,7 @@
  	VALUES (#{userid},#{backjf},
  	(SELECT username FROM gm_user_t WHERE id=#{userid}),
  	#{gmnum},'时时彩',#{jf},0,#{buyinfo},#{winjf},#{getjf},#{count},#{sumjf},now(),now());
- 	update gm_user_t set jftask=jftask-#{jf},lastup_date=#{item.lastup_date}
+ 	update gm_user_t set jftask=jftask-#{jf}*100,lastup_date=#{lastup_date}
   				where id=#{userid} 
  </insert> 
  <select id="getPools" resultType="com.zcc.game.vo.PoolVO">

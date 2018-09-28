@@ -125,6 +125,21 @@
 			</if>
 		</where>
  </update>
+ 
+ <insert id="addGiveToken">
+ 	INSERT INTO gm_givetoken_t (account,pid,num,createdate) VALUES(#{account},#{pid},#{num},NOW())
+ </insert>
+ <select id="getGiveToken" resultType="com.zcc.game.vo.GiveTokenVO">
+ 	SELECT * FROM gm_givetoken_t 
+ 	<where>
+			<if test="pid != null">
+				and pid=#{pid}
+			</if>
+			<if test="account != null">
+				and account=#{account}
+			</if>
+		</where>
+ </select>
  <select id="getParam" resultType="com.zcc.game.vo.ParamVO">
  	SELECT * FROM gm_backparam_t 
  	where number=#{number}

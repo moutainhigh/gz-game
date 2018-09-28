@@ -51,33 +51,33 @@ public class JfController extends BaseController{
         }
         
         //比较数据version是否最新
-        int zhuce = users.get(0).getJfzhuce()-users.get(0).getJfDiya();
-        int center = users.get(0).getJfcenter();
+        double zhuce = new Double(users.get(0).getJfzhuce()) -users.get(0).getJfDiya();
+        double center = new Double(users.get(0).getJfcenter());
         int jfrale=Integer.parseInt(jf)*100;
         if("1".equals(type) && jfrale<=zhuce){//(注册->中心)
-        	user.setJfzhuce(-jfrale);
-        	user.setJfcenter(jfrale);
+        	user.setJfzhuce(-jfrale+"");
+        	user.setJfcenter(jfrale+"");
         }else if("2".equals(type) && jfrale<=zhuce){//(注册->交易)
-        	user.setJfzhuce(-jfrale);
-        	user.setJfbusiness(jfrale);
+        	user.setJfzhuce(-jfrale+"");
+        	user.setJfbusiness(jfrale+"");
         }else if("3".equals(type) && jfrale<=zhuce){//(注册->任务)
         	//要有预申请的任务积分
         	if(users.get(0).getVersion()>0 && users.get(0).getVersion()==Integer.parseInt(jf)){
-        		user.setJfzhuce(-jfrale);
-            	user.setJftask(jfrale);
+        		user.setJfzhuce(-jfrale+"");
+            	user.setJftask(jfrale+"");
             	user.setVersion(0);
         	}else{
         		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
             	return;
         	}
         }else if("4".equals(type) && jfrale<=center){//(中心->交易)
-        	user.setJfcenter(-jfrale);
-        	user.setJfbusiness(jfrale);
+        	user.setJfcenter(-jfrale+"");
+        	user.setJfbusiness(jfrale+"");
         }else if("5".equals(type) && jfrale<=center){//(中心->任务)
         	//要有预申请的任务积分
         	if(users.get(0).getVersion()>0 && users.get(0).getVersion()==Integer.parseInt(jf)){
-        		user.setJfcenter(-jfrale);
-            	user.setJftask(jfrale);
+        		user.setJfcenter(-jfrale+"");
+            	user.setJftask(jfrale+"");
             	user.setVersion(0);
         	}else{
         		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);

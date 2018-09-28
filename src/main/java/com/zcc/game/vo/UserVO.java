@@ -25,10 +25,10 @@ public class UserVO {
 	private String bankNum;
 	private String bankName;
 	private String status;
-	private Integer jfcenter;
-	private Integer jftask;
-	private Integer jfbusiness;
-	private Integer jfzhuce;
+	private String jfcenter;
+	private String jftask;
+	private String jfbusiness;
+	private String jfzhuce;
 	private Integer jfDiya;
 	private Integer taskToken;
 	private Integer usedtoken;
@@ -105,28 +105,28 @@ public class UserVO {
 	public void setBankName(String bankName) {
 		this.bankName = bankName;
 	}
-	public Integer getJfcenter() {
+	public String getJfcenter() {
 		return jfcenter;
 	}
-	public void setJfcenter(Integer jfcenter) {
+	public void setJfcenter(String jfcenter) {
 		this.jfcenter = jfcenter;
 	}
-	public Integer getJftask() {
+	public String getJftask() {
 		return jftask;
 	}
-	public void setJftask(Integer jftask) {
+	public void setJftask(String jftask) {
 		this.jftask = jftask;
 	}
-	public Integer getJfbusiness() {
+	public String getJfbusiness() {
 		return jfbusiness;
 	}
-	public void setJfbusiness(Integer jfbusiness) {
+	public void setJfbusiness(String jfbusiness) {
 		this.jfbusiness = jfbusiness;
 	}
-	public Integer getJfzhuce() {
+	public String getJfzhuce() {
 		return jfzhuce;
 	}
-	public void setJfzhuce(Integer jfzhuce) {
+	public void setJfzhuce(String jfzhuce) {
 		this.jfzhuce = jfzhuce;
 	}
 	public Integer getJfDiya() {

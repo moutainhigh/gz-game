@@ -79,10 +79,11 @@ public class HomeController extends BaseController{
 	//获取挂卖信息
 	@RequestMapping("/getBusiness")
 	public void getBusiness(HttpServletRequest request,HttpServletResponse response){
-		String[] paramKey = {"status","userid"};
+		String[] paramKey = {"status","userid","type"};
 		Map<String, String> params = parseParams(request, "getBusiness", paramKey);
         String status = params.get("status"); //1待售，2交易中，3，完成，4，过期
         String userid = params.get("userid"); 
+        String type = params.get("type");//1挂卖，2购买 
 //        if(StringUtils.isBlank(status) ){//
 //        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
 //        	return;
@@ -90,7 +91,11 @@ public class HomeController extends BaseController{
         
         BusinessVO business = new BusinessVO();
         business.setStatus(status);
-        business.setUserid(userid);
+        if("1".equals(type)){//挂卖信息
+        	business.setUserid(userid);
+        }else{//购买信息
+        	business.setBuyerid(userid);
+        }
         try {
 	        //获取挂卖信息
 	    	List<BusinessVO> result = homeService.getBusiness(business);
@@ -132,7 +137,7 @@ public class HomeController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
-        int businessjf=users.get(0).getJfbusiness();
+        double businessjf=new Double(users.get(0).getJfbusiness());
         int pretake=users.get(0).getPretake();//预扣减
     	String pwd=users.get(0).getSafepwd();
     	if(businessjf-pretake<Integer.parseInt(selljf)*100 || !MD5Util.MD5(safepwd).equals(pwd)){
@@ -379,24 +384,45 @@ public class HomeController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
+		ParamVO param=new ParamVO();
+		param.setNumber("003");//获取赔率
+		param = userService.getParam(param);
+		if(param==null||param.getData()==null){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+		}
+		
+		double d=new Double(param.getData())*100;
+		double dw=d-100;
         PoolVO data = new PoolVO();
         data.setUserid(userid);
         data.setJf(jf);
         data.setBuyinfo(type);
         data.setGmnum(gmnum);
-        int win=Integer.parseInt(jf);
-        int w=Integer.parseInt(count)*win*198;
-        int n=Integer.parseInt(count)*win*98;
+        double win=new Double(jf);
+        double w=new Double(count)*win*d;
+        double n=new Double(count)*win*dw;
         data.setWinjf(n+"");
         data.setGetjf(w+"");
-        data.setCount(Integer.parseInt(count));
-        data.setSumjf(Integer.parseInt(count)*win);//合计积分
-        data.setBackjf("100");//返还一个积分
+        data.setCount(count);
+        double sum=Integer.parseInt(count)*win;
+        data.setSumjf(sum+"");//合计积分
+        //获取返还比例
+        ParamVO p=new ParamVO();
+        p.setNumber("005");//获取赔率
+		p = userService.getParam(p);
+		if(p==null||p.getData()==null){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+		}
+		int peilv=Integer.parseInt(p.getData());
+		double backjf=sum*peilv;
+        data.setBackjf(backjf+"");//返还一个积分
         //校验用户有效性和足够的积分。
         UserVO user=new UserVO();
         user.setId(Integer.parseInt(userid));
         List<UserVO> users = userService.getUsers(user);
-        if(users==null || users.get(0).getJftask()<win){
+        if(users==null || new Double(users.get(0).getJftask())<win){
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足");
         	return;
         }
@@ -436,6 +462,14 @@ public class HomeController extends BaseController{
 	        //获取开奖数据
 	    	List<PoolVO> result = homeService.getPools(pool);
 	    	if(result !=null && result.size()>0){
+	    		for (int i = 0; i < result.size(); i++) {
+	    			double back=new Double(result.get(i).getBackjf())/100;
+	    			double win=new Double(result.get(i).getWinjf())/100;
+	    			double get=new Double(result.get(i).getGetjf())/100;
+	    			result.get(i).setBackjf(back+"");
+	    			result.get(i).setWinjf(win+"");
+	    			result.get(i).setGetjf(get+"");
+				}
 	    		renderJson(request, response, SysCode.SUCCESS, result);
 			}else{
 				renderJson(request, response, SysCode.SUCCESS, result);

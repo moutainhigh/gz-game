@@ -25,6 +25,7 @@ import com.zcc.game.common.UploadType;
 import com.zcc.game.service.ImageService;
 import com.zcc.game.service.UserService;
 import com.zcc.game.utils.MD5Util;
+import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.UserVO;
 
@@ -43,10 +44,14 @@ public class UserController extends BaseController{
 	private ImageService imageService;
 	
 	public void changeData(UserVO user){
-		user.setJfbusiness(user.getJfbusiness()/100);
-		user.setJfcenter(user.getJfcenter()/100);
-		user.setJftask(user.getJftask()/100);
-		user.setJfzhuce(user.getJfzhuce()/100);
+		double businessjf=new Double(user.getJfbusiness())/100;
+		double centerjf=new Double(user.getJfcenter())/100;
+		double taskjf=new Double(user.getJftask())/100;
+		double zhucejf=new Double(user.getJfzhuce())/100;
+		user.setJfbusiness(businessjf+"");
+		user.setJfcenter(centerjf+"");
+		user.setJftask(taskjf+"");
+		user.setJfzhuce(zhucejf+"");
 	}
 	@RequestMapping("/getUsers")
 //	@ResponseBody
@@ -176,14 +181,15 @@ public class UserController extends BaseController{
 			UserVO parent = new UserVO();
 			parent.setId(Integer.parseInt(pid));
 			List<UserVO> list = userService.getUsers(parent);
-	        if(list==null || list.size()<=0 || list.get(0).getJfcenter()<Integer.parseInt(jfzhuce)*100){
+	        if(list==null || list.size()<=0 || Integer.parseInt(list.get(0).getJfcenter())<Integer.parseInt(jfzhuce)*100){
 	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足");//用户名已注册
 				return;
 	        }
 	        
 			userVO.setPassword(MD5Util.MD5(password));
 			userVO.setSafepwd(MD5Util.MD5(safepwd));
-			userVO.setJfzhuce(Integer.parseInt(jfzhuce)*100);
+			int zhucejf=Integer.parseInt(jfzhuce)*100;
+			userVO.setJfzhuce(zhucejf+"");
 			userVO.setJfold(jfzhuce);
 			userVO.setJfDiya(Integer.parseInt(jfzhuce)*num);
 			userVO.setPid(Integer.parseInt(pid));
@@ -350,6 +356,37 @@ public class UserController extends BaseController{
 		}
 	}
 	
+	//赠送秘钥
+	@RequestMapping("/getGiveToken")
+	public void getGiveToken(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userId","account"};
+        Map<String, String> params = parseParams(request, "getGiveToken", paramKey);
+        
+        String userid = params.get("userId"); 
+        String account = params.get("account"); //userId 不为空表示赠送秘钥，account 表示收入秘钥
+        if(StringUtils.isBlank(userid) && StringUtils.isBlank(account)){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+        GiveTokenVO giveToken =new GiveTokenVO();
+        giveToken.setPid(userid);
+        giveToken.setAccount(account);
+        try {
+	        //更新
+        	 List<GiveTokenVO> list = userService.getGiveToken(giveToken);
+	    	if(list.size()>0){
+	    		renderJson(request, response, SysCode.SUCCESS, list);
+			}else{
+				renderJson(request, response, SysCode.SUCCESS, list);
+			}
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getGiveToken()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+		
 	/**
 	 * 上传——图片信息
 	 * @param request

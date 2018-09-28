@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zcc.game.mapper.UserMapper;
+import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.UserVO;
 
@@ -40,14 +41,25 @@ public class UserService {
 	}
 	@Transactional
 	public int gaveToken(UserVO user){
+		int m=0;
+		int n=0;
 		UserVO child=new UserVO();
 		child.setAccount(user.getAccount());
 		child.setTaskToken(user.getTaskToken());
-		userMapper.gaveToken(child);
+		m=userMapper.gaveToken(child);
 		UserVO parent=new UserVO();
 		parent.setId(user.getId());
 		parent.setTaskToken(-user.getTaskToken());
-		return userMapper.gaveToken(parent);
+		n=userMapper.gaveToken(parent);
+		//添加赠送秘钥日志。
+		if(m>0 && n>0){
+			GiveTokenVO giveToken=new GiveTokenVO();
+			giveToken.setAccount(user.getAccount());
+			giveToken.setNum(user.getTaskToken()+"");
+			giveToken.setPid(user.getId()+"");
+			userMapper.addGiveToken(giveToken);
+		}
+		return 1;
 	}
 	public boolean isExistUser(UserVO user){
 		List<UserVO> list= getUsers(user);
@@ -60,5 +72,7 @@ public class UserService {
 	public ParamVO getParam(ParamVO param){
 		return userMapper.getParam(param);
 	}
-	
+	public List<GiveTokenVO> getGiveToken(GiveTokenVO param){
+		return userMapper.getGiveToken(param);
+	}
 }

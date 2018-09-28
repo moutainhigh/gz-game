@@ -116,11 +116,11 @@ public class HomeService {
 			String sellerId=list.get(0).getUserid();
 			UserVO user=new UserVO();
 			user.setId(Integer.parseInt(buyerId));
-			user.setJfcenter(jf);
+			user.setJfcenter(jf+"");
 			userMapper.updateUser(user);//购买人增加积分
 			UserVO user2=new UserVO();
 			user2.setId(Integer.parseInt(sellerId));
-			user2.setJfbusiness(-jf);
+			user2.setJfbusiness(-jf+"");
 			user2.setPretake(-jf);
 			userMapper.updateUser(user2);//卖出人减去积分
 		}else if("2".equals(business.getStatus())){//买家购买，状态变为交易中
@@ -195,6 +195,8 @@ public class HomeService {
 		List<DataVO> dataList = homeMapper.getData(vo);
 		if(dataList==null || dataList.size()<=0){
 			homeMapper.addData(vo);
+			//获取到数据，开奖,结算。
+			updatePoolJF(vo.getGmnum());//开奖期号
 		}
 	}
 	

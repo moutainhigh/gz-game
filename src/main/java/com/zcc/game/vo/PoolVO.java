@@ -15,8 +15,8 @@ public class PoolVO {
 	private String backjf;
 	private String winjf;
 	private String getjf;
-	private Integer count;
-	private Integer sumjf;
+	private String count;
+	private String sumjf;
 	private Date create_date;
 	private Date lastup_date;
 	public Integer getId() {
@@ -97,16 +97,16 @@ public class PoolVO {
 	public void setLastup_date(Date lastup_date) {
 		this.lastup_date = lastup_date;
 	}
-	public Integer getCount() {
+	public String getCount() {
 		return count;
 	}
-	public void setCount(Integer count) {
+	public void setCount(String count) {
 		this.count = count;
 	}
-	public Integer getSumjf() {
+	public String getSumjf() {
 		return sumjf;
 	}
-	public void setSumjf(Integer sumjf) {
+	public void setSumjf(String sumjf) {
 		this.sumjf = sumjf;
 	}
 	
