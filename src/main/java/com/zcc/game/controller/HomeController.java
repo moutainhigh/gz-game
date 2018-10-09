@@ -381,7 +381,7 @@ public class HomeController extends BaseController{
 		String count = "1"; 
 		
 		if(StringUtils.isBlank(userid) || StringUtils.isBlank(jf) || StringUtils.isBlank(type)
-				|| StringUtils.isBlank(gmnum) || StringUtils.isBlank(count)){
+				|| StringUtils.isBlank(gmnum) ){
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
