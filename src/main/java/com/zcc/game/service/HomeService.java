@@ -202,8 +202,11 @@ public class HomeService {
 	}
 	
 	@Transactional
-	public int addPool(PoolVO pool){
-		return homeMapper.addPool(pool);
+	public int addPool(List<PoolVO> pools){
+		for (int i = 0; i < pools.size(); i++) {
+			homeMapper.addPool(pools.get(i));
+		}
+		return 1;
 	}
 	public List<PoolVO> getPools(PoolVO pool){
 		return homeMapper.getPools(pool);

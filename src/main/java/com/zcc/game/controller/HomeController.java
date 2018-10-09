@@ -1,5 +1,6 @@
 package com.zcc.game.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -377,7 +378,7 @@ public class HomeController extends BaseController{
 		String jf = params.get("jf"); 
 		String type = params.get("type"); 
 		String gmnum = params.get("gmnum"); 
-		String count = params.get("count"); 
+		String count = "1"; 
 		
 		if(StringUtils.isBlank(userid) || StringUtils.isBlank(jf) || StringUtils.isBlank(type)
 				|| StringUtils.isBlank(gmnum) || StringUtils.isBlank(count)){
@@ -391,23 +392,7 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
 		}
-		
-		double d=new Double(param.getData());
-		double dw=d-1;
-        PoolVO data = new PoolVO();
-        data.setUserid(userid);
-        data.setJf(jf);
-        data.setBuyinfo(type);
-        data.setGmnum(gmnum);
-        double win=new Double(jf);
-        double w=new Double(count)*win*d;
-        double n=new Double(count)*win*dw;
-        data.setWinjf(n+"");
-        data.setGetjf(w+"");
-        data.setCount(count);
-        double sum=Integer.parseInt(count)*win;
-        data.setSumjf(sum+"");//合计积分
-        //获取返还比例
+		//获取返还比例
         ParamVO p=new ParamVO();
         p.setNumber("005");//获取赔率
 		p = userService.getParam(p);
@@ -415,20 +400,45 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
 		}
-		Double peilv=new Double(p.getData())/100;
-		double backjf=sum*peilv;
-        data.setBackjf(backjf+"");//返还一个积分
+		double d=new Double(param.getData());
+		double dw=d-1;
+		double total=0;
+		List<PoolVO> list=new ArrayList<PoolVO>();
+		String strtype []=type.split(",");
+		String strjf []=jf.split(",");
+		for (int i = 0; i < strtype.length; i++) {
+			 PoolVO data = new PoolVO();
+		        data.setUserid(userid);
+		        data.setJf(strjf[i]);
+		        data.setBuyinfo(strtype[i]);
+		        data.setGmnum(gmnum);
+		        double win=new Double(strjf[i]);
+		        double w=new Double(count)*win*d;
+		        double n=new Double(count)*win*dw;
+		        data.setWinjf(n+"");
+		        data.setGetjf(w+"");
+		        data.setCount(count);
+		        double sum=Integer.parseInt(count)*win;
+		        data.setSumjf(sum+"");//合计积分
+		        
+				Double peilv=new Double(p.getData())/100;
+				double backjf=sum*peilv;
+		        data.setBackjf(backjf+"");//返还一个积分
+		        total+=win;
+		        list.add(data);
+		}
+       
         //校验用户有效性和足够的积分。
         UserVO user=new UserVO();
         user.setId(Integer.parseInt(userid));
         List<UserVO> users = userService.getUsers(user);
-        if(users==null || new Double(users.get(0).getJftask())<win){
+        if(users==null || new Double(users.get(0).getJftask())<total){
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足");
         	return;
         }
         try {
 	        //下注
-	    	int result = homeService.addPool(data);
+	    	int result = homeService.addPool(list);
 	    	if(result ==1){
 	    		renderJson(request, response, SysCode.SUCCESS, result);
 			}else{
