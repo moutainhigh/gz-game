@@ -126,6 +126,7 @@ public class UserController extends BaseController{
     	
         UserVO user=new UserVO();
         user.setAccount(account);
+        user.setStatus("0");
 //        user.setPassword(MD5Util.MD5(password));
         try {
         	//1,校验账户密码

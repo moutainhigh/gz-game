@@ -43,9 +43,13 @@
  	 order by id desc
  </select>
  <insert id="insertUser">
- 	INSERT INTO gm_user_t (account,password,safepwd,jfzhuce,jf_diya,status,pid,jfold,create_date)
-	VALUES (#{account},#{password},#{safepwd},#{jfzhuce},#{jfDiya},'0',#{pid},#{jfold},NOW());
-	update gm_user_t set jfcenter=jfcenter-#{jfzhuce} where id=#{pid}
+ 	INSERT INTO gm_user_t (account,password,safepwd,jfzhuce,jf_diya,status,pid,paccount,pusername,ptelephone,jfold,create_date)
+	VALUES (#{account},#{password},#{safepwd},#{jfzhuce},#{jfDiya},'0',#{pid},
+	(SELECT account FROM gm_user_t t WHERE t.id=#{pid}),
+	(SELECT username FROM gm_user_t t WHERE t.id=#{pid}),
+	(SELECT telephone FROM gm_user_t t WHERE t.id=#{pid}),
+	#{jfold},NOW());
+	update gm_user_t set jfcenter=jfcenter-#{jfzhuce},user_type=1 where id=#{pid}
  </insert>
  
 	<update id="updateUser">
