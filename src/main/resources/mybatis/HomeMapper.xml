@@ -73,9 +73,10 @@
  </update>
  <!-- 添加任务 -->
  <insert id="addTask">
- 	INSERT INTO gm_task_t(title,STATUS,taskjf,userid,username,create_date) 
- 	VALUES (#{title},#{status},#{taskjf},#{userid},
- 	(SELECT account FROM gm_user_t WHERE id=#{userid}),
+ 	INSERT INTO gm_task_t(title,STATUS,taskjf,userid,username,attribute2,create_date) 
+ 	VALUES ((SELECT account FROM gm_user_t WHERE id=#{userid}),#{status},#{taskjf},#{userid},
+ 	(SELECT username FROM gm_user_t WHERE id=#{userid}),
+ 	(SELECT telephone FROM gm_user_t WHERE id=#{userid}),
  	now());
  	update gm_user_t set task_token=task_token-1,usedtoken=usedtoken+1 where id=#{userid}
  </insert> 

@@ -273,17 +273,18 @@ public class HomeController extends BaseController{
         	return;
 		}
 		//是否自动审批通过
+		TaskVO task = new TaskVO();
 		ParamVO param =new ParamVO();
 		param.setNumber("004");
 		param = userService.getParam(param);
 		if("1".equals(param.getAuto())){//0手动、1自动
 			status="2";//审批通过
+			task.setTaskjf(param.getData());//后台设置
 		}
-        TaskVO task = new TaskVO();
         task.setUserid(userid);
         task.setStatus(status);
         task.setTitle(title);
-        task.setTaskjf(param.getData());//后台设置
+        
         //验证今日未赢过，
         
         try {

@@ -340,6 +340,10 @@ public class UserController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
+        if(!userid.equals(childlist.get(0).getPid())){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "该账号非您的下级不能进行转赠！");
+        	return;
+        }
         user.setId(Integer.parseInt(userid));
         user.setTaskToken(Integer.parseInt(num));
         int result =0;
