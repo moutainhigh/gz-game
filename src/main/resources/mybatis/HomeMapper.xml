@@ -115,6 +115,12 @@
  	</where>
  	order by id desc LIMIT 10
  </select>
+ 
+ <select id="getDataByPaiLong" resultType="com.zcc.game.vo.DataVO">
+ 	SELECT *
+ 	FROM gm_data_t 
+ 	order by id desc LIMIT 1000
+ </select>
  <!-- 添加开奖信息 -->
  <insert id="addData">
  	INSERT INTO gm_data_t(gmnum,gm1,gm2,gm3,gm4,gm5,gmsum,bgm1,bgm2,bgm3,bgm4,bgm5,bgmsum,sgm1,sgm2,sgm3,sgm4,sgm5,sgmsum,create_date,lastup_date) 
@@ -165,6 +171,14 @@
   			</if>
 		</foreach>
  </update>
+ <!-- 添加排龙 -->
+ <insert id="addPaiLong">
+ 	TRUNCATE TABLE gm_pailong_t; 
+ 	<foreach collection="list" item="item" separator=";">
+			INSERT INTO gm_pailong_t (number,content,NAME,create_date) 
+			VALUES (#{item.number},#{item.content},#{item.name},now())
+	</foreach>
+ </insert>
  <!-- 添加留言 -->
  <insert id="addMessage">
  	insert into gm_message_t(content,userid,username,account,telephone,create_date)
@@ -199,6 +213,10 @@
  			and account=#{account}
  		</if>
  	</where>
+ </select>
+ <!-- 查看排龙列表 -->
+ <select id="getPailong" resultType="com.zcc.game.vo.PailongVO">
+ 	select * from gm_pailong_t
  </select>
  
 </mapper>

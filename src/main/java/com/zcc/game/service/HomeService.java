@@ -1,6 +1,7 @@
 package com.zcc.game.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +23,7 @@ import com.zcc.game.vo.ChangeCenterVO;
 import com.zcc.game.vo.DataVO;
 import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
+import com.zcc.game.vo.PailongVO;
 import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.TaskVO;
 import com.zcc.game.vo.TokenVO;
@@ -53,6 +55,9 @@ public class HomeService {
     
 	public List<NoticeVO> getNotices(NoticeVO notice){
 		return homeMapper.getNotices(notice);
+	}
+	public List<PailongVO> getPailong(PailongVO pailong){
+		return homeMapper.getPailong(pailong);
 	}
 	public List<BusinessVO> getBusiness(BusinessVO business){
 		return homeMapper.getBusiness(business);
@@ -198,9 +203,341 @@ public class HomeService {
 			homeMapper.addData(vo);
 			//获取到数据，开奖,结算。
 			updatePoolJF(vo.getGmnum());//开奖期号
+			//获取排龙信息
+			getPaiLongData();
 		}
 	}
 	
+	//获取两面排龙
+	public void getPaiLongData(){
+		List<DataVO> list = homeMapper.getDataByPaiLong(null);
+		List<PailongVO> paiLongList=new ArrayList<PailongVO>();
+		String bgm1="";
+		String bgm2="";
+		String bgm3="";
+		String bgm4="";
+		String bgm5="";
+		String sgm1="";
+		String sgm2="";
+		String sgm3="";
+		String sgm4="";
+		String sgm5="";
+		String sumbs="";
+		String sumsd="";
+		int bg1=1;
+		int bg2=1;
+		int bg3=1;
+		int bg4=1;
+		int bg5=1;
+		int sg1=1;
+		int sg2=1;
+		int sg3=1;
+		int sg4=1;
+		int sg5=1;
+		int sumb=1;
+		int sums=1;
+		//1号球-大小
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				bgm1=dataVO.getBgm1();
+			}else{
+				if(bgm1.equals(dataVO.getBgm1())){//相同
+					bg1++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(bg1>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(bg1+"期");
+			if(bgm1.equals("大")){
+				pailong.setNumber("big1");
+				pailong.setName("1号球-大");
+			}else{
+				pailong.setNumber("small1");
+				pailong.setName("1号球-小");
+			}
+			paiLongList.add(pailong);
+		}
+		//2号球-大小
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				bgm2=dataVO.getBgm2();
+			}else{
+				if(bgm2.equals(dataVO.getBgm2())){//相同
+					bg2++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(bg2>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(bg2+"期");
+			if(bgm2.equals("大")){
+				pailong.setNumber("big2");
+				pailong.setName("2号球-大");
+			}else{
+				pailong.setNumber("small2");
+				pailong.setName("2号球-小");
+			}
+			paiLongList.add(pailong);
+		}
+		//3号球-大小
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				bgm3=dataVO.getBgm3();
+			}else{
+				if(bgm3.equals(dataVO.getBgm3())){//相同
+					bg3++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(bg3>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(bg3+"期");
+			if(bgm3.equals("大")){
+				pailong.setNumber("big3");
+				pailong.setName("3号球-大");
+			}else{
+				pailong.setNumber("small3");
+				pailong.setName("3号球-小");
+			}
+			paiLongList.add(pailong);
+		}
+		//4号球-大小
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				bgm4=dataVO.getBgm4();
+			}else{
+				if(bgm4.equals(dataVO.getBgm4())){//相同
+					bg4++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(bg4>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(bg4+"期");
+			if(bgm4.equals("大")){
+				pailong.setNumber("big4");
+				pailong.setName("4号球-大");
+			}else{
+				pailong.setNumber("small4");
+				pailong.setName("4号球-小");
+			}
+			paiLongList.add(pailong);
+		}
+		//5号球-大小
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				bgm5=dataVO.getBgm5();
+			}else{
+				if(bgm5.equals(dataVO.getBgm5())){//相同
+					bg5++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(bg5>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(bg5+"期");
+			if(bgm5.equals("大")){
+				pailong.setNumber("big5");
+				pailong.setName("5号球-大");
+			}else{
+				pailong.setNumber("small5");
+				pailong.setName("5号球-小");
+			}
+			paiLongList.add(pailong);
+		}
+		//1号球-单双
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				sgm1=dataVO.getSgm1();
+			}else{
+				if(sgm1.equals(dataVO.getSgm1())){//相同
+					sg1++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(sg1>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(sg1+"期");
+			if(sgm1.equals("单")){
+				pailong.setNumber("single1");
+				pailong.setName("1号球-单");
+			}else{
+				pailong.setNumber("doub1");
+				pailong.setName("1号球-双");
+			}
+			paiLongList.add(pailong);
+		}
+		//2号球-单双
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				sgm2=dataVO.getSgm2();
+			}else{
+				if(sgm2.equals(dataVO.getSgm2())){//相同
+					sg2++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(sg2>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(sg2+"期");
+			if(sgm2.equals("单")){
+				pailong.setNumber("single2");
+				pailong.setName("2号球-单");
+			}else{
+				pailong.setNumber("doub2");
+				pailong.setName("2号球-双");
+			}
+			paiLongList.add(pailong);
+		}
+		//3号球-单双
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				sgm3=dataVO.getSgm3();
+			}else{
+				if(sgm3.equals(dataVO.getSgm3())){//相同
+					sg3++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(sg3>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(sg3+"期");
+			if(sgm3.equals("单")){
+				pailong.setNumber("single3");
+				pailong.setName("3号球-单");
+			}else{
+				pailong.setNumber("doub3");
+				pailong.setName("3号球-双");
+			}
+			paiLongList.add(pailong);
+		}
+		//4号球-单双
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				sgm4=dataVO.getSgm4();
+			}else{
+				if(sgm4.equals(dataVO.getSgm4())){//相同
+					sg4++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(sg4>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(sg4+"期");
+			if(sgm4.equals("单")){
+				pailong.setNumber("single4");
+				pailong.setName("4号球-单");
+			}else{
+				pailong.setNumber("doub4");
+				pailong.setName("4号球-双");
+			}
+			paiLongList.add(pailong);
+		}
+		//5号球-单双
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				sgm5=dataVO.getSgm5();
+			}else{
+				if(sgm5.equals(dataVO.getSgm5())){//相同
+					sg5++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(sg5>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(sg5+"期");
+			if(sgm5.equals("单")){
+				pailong.setNumber("single5");
+				pailong.setName("5号球-单");
+			}else{
+				pailong.setNumber("doub5");
+				pailong.setName("5号球-双");
+			}
+			paiLongList.add(pailong);
+		}
+		//总和-大小
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				sumbs=dataVO.getBgmsum();
+			}else{
+				if(sumbs.equals(dataVO.getBgmsum())){//相同
+					sumb++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(sumb>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(sumb+"期");
+			if(sumbs.equals("大")){
+				pailong.setNumber("sumbig");
+				pailong.setName("总和-大");
+			}else{
+				pailong.setNumber("sumsmall");
+				pailong.setName("总和-小");
+			}
+			paiLongList.add(pailong);
+		}
+		//总和-单双
+		for (int i = 0; i < list.size(); i++) {
+			DataVO dataVO=list.get(i);
+			if(i==0){
+				sumsd=dataVO.getSgmsum();
+			}else{
+				if(sumsd.equals(dataVO.getSgmsum())){//相同
+					sums++;
+				}else{
+					break;
+				}
+			}
+		}
+		if(sums>1){
+			PailongVO pailong=new PailongVO();
+			pailong.setContent(sums+"期");
+			if(sumsd.equals("单")){
+				pailong.setNumber("sumsingle");
+				pailong.setName("总和-单");
+			}else{
+				pailong.setNumber("sumdoub");
+				pailong.setName("总和-双");
+			}
+			paiLongList.add(pailong);
+		}				
+		homeMapper.addPaiLong(paiLongList);
+	}
 	@Transactional
 	public int addPool(List<PoolVO> pools){
 		for (int i = 0; i < pools.size(); i++) {

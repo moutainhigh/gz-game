@@ -13,6 +13,7 @@ import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.DataVO;
 import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
+import com.zcc.game.vo.PailongVO;
 import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.TaskVO;
 import com.zcc.game.vo.TokenVO;
@@ -34,9 +35,11 @@ public interface HomeMapper {
 	public List<TaskVO> getTask(TaskVO task);
 	
 	public List<DataVO> getData(DataVO task);
+	public List<DataVO> getDataByPaiLong(DataVO task);
 	public int addData(DataVO task);
 	
 	public int addPool(PoolVO pool);
+	public int addPaiLong(List<PailongVO> pailongs);
 	public List<PoolVO> getPools(PoolVO pool);
 	public int updatePools(List<PoolVO> pools);
 	
@@ -47,5 +50,6 @@ public interface HomeMapper {
 	//赠送秘钥
 	public int addToken(TokenVO token);
 	public List<TokenVO> getTokens(TokenVO token);
+	public List<PailongVO> getPailong(PailongVO pailong);
 	
 }

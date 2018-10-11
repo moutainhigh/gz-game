@@ -27,6 +27,7 @@ import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.DataVO;
 import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
+import com.zcc.game.vo.PailongVO;
 import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.TaskVO;
@@ -48,15 +49,34 @@ public class HomeController extends BaseController{
 	//获取公告
 	@RequestMapping("/test")
 	public void test(HttpServletRequest request,HttpServletResponse response){
-		String resul=HttpRequest.sendGet("http://ho.apiplus.net/newly.do?token=tf5d11ebbf5a9a989k&code=cqssc&rows=1&format=json");
-		System.out.println(resul);
-		JSONObject obj=JSONObject.parseObject(resul);
-		List<OpenData> list = JSONObject.parseArray(obj.get("data").toString(),OpenData.class);
-		for (int i = 0; i < list.size(); i++) {
-			System.out.println(list.get(i).getExpect());
-		}
+//		String resul=HttpRequest.sendGet("http://ho.apiplus.net/newly.do?token=tf5d11ebbf5a9a989k&code=cqssc&rows=1&format=json");
+//		System.out.println(resul);
+//		JSONObject obj=JSONObject.parseObject(resul);
+//		List<OpenData> list = JSONObject.parseArray(obj.get("data").toString(),OpenData.class);
+//		for (int i = 0; i < list.size(); i++) {
+//			System.out.println(list.get(i).getExpect());
+//		}
+		homeService.getPaiLongData();
 	}
+	//获取两面排龙
+	@RequestMapping("/getPaiLong")
+	public void getPaiLong(HttpServletRequest request,HttpServletResponse response){
 		
+		String[] paramKey = {};
+        parseParams(request, "getPaiLong", paramKey);
+        try {
+	    	List<PailongVO> result = homeService.getPailong(null);
+	    	if(result !=null && result.size()>0){
+	    		renderJson(request, response, SysCode.SUCCESS, result);
+			}else{
+				renderJson(request, response, SysCode.SUCCESS, result);
+			}
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getPaiLong()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}	
 	//获取公告
 	@RequestMapping("/getNotice")
 	public void getNotice(HttpServletRequest request,HttpServletResponse response){
