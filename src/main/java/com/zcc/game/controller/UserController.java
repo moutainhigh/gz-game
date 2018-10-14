@@ -489,7 +489,7 @@ public class UserController extends BaseController{
 
 	@RequestMapping("/upload")
 	@ResponseBody
-	public String testUploadFile(HttpServletRequest req,MultipartHttpServletRequest multiReq) throws IOException{
+	public void testUploadFile(HttpServletRequest req,HttpServletResponse response,MultipartHttpServletRequest multiReq) throws IOException{
 //		List<String> urls = new ArrayList<String>();
 //		Map<String, Object> result = new HashMap<String, Object>();
 //		
@@ -521,12 +521,17 @@ public class UserController extends BaseController{
 //			return result;
 //		}  
 //		String path="/home/upload/1.jpg";
+		String[] paramKey = {"userId","type"};
+        Map<String, String> params = parseParams(req, "update", paramKey);
+        
+		System.out.println("开始上传文件：·······"+multiReq.getFile("file").getOriginalFilename());
 		String ext =  FilenameUtils.getExtension(multiReq.getFile("file").getOriginalFilename());
         String reName = RandomStringUtils.randomAlphanumeric(32).toLowerCase() + "."+ ext;
         String cdate = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		String path="/usr/local/nginx/html/pic/"+cdate;
 		if(!new File(path).exists()){
 			new File(path).mkdir();
+			System.out.println("创建路径：·······"+path);
 		}
 //		"F:\\upload\\1.jpg"
 		FileOutputStream fos=new FileOutputStream(new File(path+File.separator+reName));
@@ -538,7 +543,9 @@ public class UserController extends BaseController{
 		}
 		fos.close();
 		in.close();
-		return "pic/"+cdate+File.separator+reName;
+		System.out.println("上传完成：·······"+path);
+		renderJson(req, response, SysCode.SUCCESS, "pic/"+cdate+File.separator+reName);
+//		return "pic/"+cdate+File.separator+reName;
 	}
 	
 }
