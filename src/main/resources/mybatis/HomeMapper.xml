@@ -64,7 +64,7 @@
 	(SELECT weixinpic FROM gm_user_t WHERE id=#{userid}),
 	(SELECT alipaypic FROM gm_user_t WHERE id=#{userid}),
 	#{selljf},1,now());
-	update gm_user_t set jfbusiness=jfbusiness+#{selljf} where id=#{userid}
+	update gm_user_t set jfbusiness=jfbusiness-#{selljf} where id=#{userid}
  </insert> 
  <!-- 更新挂卖信息 -->
  <update id="updateBusiness">
