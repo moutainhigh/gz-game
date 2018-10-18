@@ -1,6 +1,8 @@
 package com.zcc.game.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zcc.game.common.CommonUtil;
 import com.zcc.game.common.HttpRequest;
 import com.zcc.game.common.SysCode;
 //import com.zcc.game.mq.RabbitMQSender;
@@ -77,6 +80,34 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}	
+	//获取赢的记录数
+	@RequestMapping("/getWinData")
+	public void getWinData(HttpServletRequest request,HttpServletResponse response){
+
+		String[] paramKey = {"userId"};
+		Map<String, String> params = parseParams(request, "getWinData", paramKey);
+        String userId = params.get("userId"); 
+        
+        PoolVO pool = new PoolVO();
+        pool.setStatus("1");//赢的记录
+        pool.setUserid(userId);
+        pool.setAfterDay(CommonUtil.getAfterDate());
+        pool.setNowDay(CommonUtil.getDateStr());
+        try {
+	        //获取赢的记录数
+	    	List<PoolVO> result = homeService.getWinData(pool);
+	    	if(result !=null && result.size()>0){
+	    		renderJson(request, response, SysCode.SUCCESS, result);
+			}else{
+				renderJson(request, response, SysCode.SUCCESS, result);
+			}
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getWinData()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+		
 	//获取公告
 	@RequestMapping("/getNotice")
 	public void getNotice(HttpServletRequest request,HttpServletResponse response){
@@ -159,9 +190,9 @@ public class HomeController extends BaseController{
         	return;
         }
         double businessjf=new Double(users.get(0).getJfbusiness());
-        double pretake=users.get(0).getPretake();//预扣减
+//        double pretake=users.get(0).getPretake();//预扣减
     	String pwd=users.get(0).getSafepwd();
-    	if(businessjf-pretake<Integer.parseInt(selljf) || !MD5Util.MD5(safepwd).equals(pwd)){
+    	if(businessjf<Integer.parseInt(selljf) || !MD5Util.MD5(safepwd).equals(pwd)){
     		renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足或密码错误");
         	return;
     	}
@@ -279,6 +310,17 @@ public class HomeController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
+		//校验今天--是否有赢过
+		PoolVO pool = new PoolVO();
+        pool.setStatus("1");//赢的记录
+        pool.setUserid(userid);
+        pool.setAfterDay(CommonUtil.getAfterDate());
+        pool.setNowDay(CommonUtil.getDateStr());
+		List<PoolVO> list = homeService.getWinData(pool);
+		if(list.size()>0){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "当天赢过不能再申请任务了");
+        	return;
+		}
 		//验证是否还有足够的秘钥
 		UserVO user =new UserVO();
 		user.setId(Integer.parseInt(userid));
@@ -406,6 +448,18 @@ public class HomeController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
+		//校验今天--是否有赢过
+				PoolVO pool = new PoolVO();
+		        pool.setStatus("1");//赢的记录
+		        pool.setUserid(userid);
+		        pool.setAfterDay(CommonUtil.getAfterDate());
+		        pool.setNowDay(CommonUtil.getDateStr());
+				List<PoolVO> pools = homeService.getWinData(pool);
+				if(pools.size()>0){
+					renderJson(request, response, SysCode.PARAM_IS_ERROR, "当天赢过不能再申请任务了");
+		        	return;
+				}
+				
 		ParamVO param=new ParamVO();
 		param.setNumber("003");//获取赔率
 		param = userService.getParam(param);
@@ -493,14 +547,14 @@ public class HomeController extends BaseController{
 	        //获取开奖数据
 	    	List<PoolVO> result = homeService.getPools(pool);
 	    	if(result !=null && result.size()>0){
-	    		for (int i = 0; i < result.size(); i++) {
-	    			double back=new Double(result.get(i).getBackjf());
-	    			double win=new Double(result.get(i).getWinjf());
-	    			double get=new Double(result.get(i).getGetjf());
-	    			result.get(i).setBackjf(back+"");
-	    			result.get(i).setWinjf(win+"");
-	    			result.get(i).setGetjf(get+"");
-				}
+//	    		for (int i = 0; i < result.size(); i++) {
+//	    			double back=new Double(result.get(i).getBackjf());
+//	    			double win=new Double(result.get(i).getWinjf());
+//	    			double get=new Double(result.get(i).getGetjf());
+//	    			result.get(i).setBackjf(back+"");
+//	    			result.get(i).setWinjf(win+"");
+//	    			result.get(i).setGetjf(get+"");
+//				}
 	    		renderJson(request, response, SysCode.SUCCESS, result);
 			}else{
 				renderJson(request, response, SysCode.SUCCESS, result);

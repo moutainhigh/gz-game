@@ -38,6 +38,10 @@ public class HomeService {
 	@Autowired
 	private UserMapper userMapper;
 	
+	//获取今天赢的记录数
+	public List<PoolVO> getWinData(PoolVO notice){
+		return homeMapper.getWinData(notice);
+	}
 	/**
      * 获取定时任务执行时间
      * @param fixTime
@@ -124,11 +128,11 @@ public class HomeService {
 			user.setId(Integer.parseInt(buyerId));
 			user.setJfcenter(jf);
 			userMapper.updateUser(user);//购买人增加积分
-			UserVO user2=new UserVO();
-			user2.setId(Integer.parseInt(sellerId));
-			user2.setJfbusiness(-jf);
-			user2.setPretake(-jf);
-			userMapper.updateUser(user2);//卖出人减去积分
+//			UserVO user2=new UserVO();
+//			user2.setId(Integer.parseInt(sellerId));
+//			user2.setJfbusiness(-jf);
+//			user2.setPretake(-jf);
+//			userMapper.updateUser(user2);//卖出人减去积分
 		}else if("2".equals(business.getStatus())){//买家购买，状态变为交易中
 			//添加定时任务，24小时之内付款，否则封号，解压状态继续售卖。
 			// 添加定时任务

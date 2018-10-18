@@ -1,6 +1,9 @@
 package com.zcc.game.common;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +54,21 @@ public class CommonUtil {
         return includes;
 	}
 	
-	
+	public static String getAfterDate(){
+		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar c = Calendar.getInstance();
+		System.out.println("当前日期:"+sf.format(c.getTime()));
+		c.add(Calendar.DAY_OF_MONTH, 1);
+		System.out.println("增加一天后日期:"+sf.format(c.getTime()));
+		return sf.format(c.getTime());
+	}
+	public static String getDateStr(){
+		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar c = Calendar.getInstance();
+		System.out.println("当前日期:"+sf.format(c.getTime()));
+//		c.add(Calendar.DAY_OF_MONTH, 1);
+//		System.out.println("增加一天后日期:"+sf.format(c.getTime()));
+		return sf.format(c.getTime());
+	}
 	
 }

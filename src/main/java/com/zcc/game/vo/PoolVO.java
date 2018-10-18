@@ -19,6 +19,21 @@ public class PoolVO {
 	private String sumjf;
 	private Date create_date;
 	private Date lastup_date;
+	private String nowDay;
+	private String afterDay;
+	
+	public String getNowDay() {
+		return nowDay;
+	}
+	public void setNowDay(String nowDay) {
+		this.nowDay = nowDay;
+	}
+	public String getAfterDay() {
+		return afterDay;
+	}
+	public void setAfterDay(String afterDay) {
+		this.afterDay = afterDay;
+	}
 	public Integer getId() {
 		return id;
 	}

@@ -26,6 +26,7 @@ import com.zcc.game.vo.TokenVO;
 public interface HomeMapper {
 	
 	public List<NoticeVO> getNotices(NoticeVO user);
+	public List<PoolVO> getWinData(PoolVO poolVO);
 	public List<BusinessVO> getBusiness(BusinessVO business);
 	public int addBusiness(BusinessVO business);
 	public int updateBusiness(BusinessVO business);
