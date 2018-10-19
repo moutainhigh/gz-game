@@ -24,7 +24,7 @@
  		<if test="gmnum != null">
  			and gmnum=#{gmnum}
  		</if>
- 		<if test="create_date != null">
+ 		<if test="nowDay != null">
  		<![CDATA[
  			and create_date >= #{nowDay}
  			and create_date < #{afterDay}
@@ -34,6 +34,27 @@
  	order by create_date desc
  </select>
  
+ <!-- 查看挂卖信息 -->
+ <select id="getBuyJf" resultType="com.zcc.game.vo.BusinessVO">
+ 	SELECT *
+ 	FROM gm_business_t 
+ 	<where>
+ 		<if test="status!=null">
+ 			and status=#{status}
+ 		</if>
+ 		<if test="userid != null">
+	 		<![CDATA[
+	 			and userid<>#{userid} and status<>4 ]]>
+ 		</if>
+ 		<if test="buyerid != null">
+ 			and buyerid=#{buyerid}
+ 		</if>
+ 		<if test="id != null">
+ 			and id=#{id}
+ 		</if>
+ 	</where>
+ 	order by create_date desc
+ </select>
  <!-- 查看挂卖信息 -->
  <select id="getBusiness" resultType="com.zcc.game.vo.BusinessVO">
  	SELECT *

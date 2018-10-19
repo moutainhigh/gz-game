@@ -66,6 +66,10 @@ public class HomeService {
 	public List<BusinessVO> getBusiness(BusinessVO business){
 		return homeMapper.getBusiness(business);
 	}
+	
+	public List<BusinessVO> getBuyJf(BusinessVO business){
+		return homeMapper.getBuyJf(business);
+	}
 	public int addBusiness(BusinessVO business) throws Exception{
 		int num = homeMapper.addBusiness(business);
 		return num;

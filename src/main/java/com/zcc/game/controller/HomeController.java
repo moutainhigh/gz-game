@@ -163,6 +163,32 @@ public class HomeController extends BaseController{
 		}
 	}
     
+	//获取购买积分信息（显示其他人的）
+		@RequestMapping("/getBuyJf")
+		public void getBuyJf(HttpServletRequest request,HttpServletResponse response){
+			String[] paramKey = {"status","userId"};
+			Map<String, String> params = parseParams(request, "getBuyJf", paramKey);
+	        String status = params.get("status"); //1待售，2交易中，3，完成，4，过期
+	        String userId = params.get("userId"); 
+	        
+	        BusinessVO business = new BusinessVO();
+	        business.setStatus(status);
+	        business.setUserid(userId);
+	        try {
+		        //获取挂卖信息
+		    	List<BusinessVO> result = homeService.getBuyJf(business);
+		    	if(result !=null && result.size()>0){
+		    		renderJson(request, response, SysCode.SUCCESS, result);
+				}else{
+					renderJson(request, response, SysCode.SUCCESS, result);
+				}
+	        } catch (Exception e) {
+	        	e.printStackTrace();
+	        	logger.info("`````method``````getBuyJf()`````"+e.getMessage());
+				renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+			}
+		}
+		
 	//增添挂卖信息
 	@RequestMapping("/addBusiness")
 	public void addBusiness(HttpServletRequest request,HttpServletResponse response){
