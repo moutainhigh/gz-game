@@ -21,6 +21,7 @@ import com.zcc.game.mapper.UserMapper;
 import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.ChangeCenterVO;
 import com.zcc.game.vo.DataVO;
+import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PailongVO;
@@ -74,6 +75,11 @@ public class HomeService {
 		int num = homeMapper.addBusiness(business);
 		return num;
 	}
+	
+	public int addBusinessLog(BusinessVO business) throws Exception{
+		int num = homeMapper.addBusinessLog(business);
+		return num;
+	}
 	public int addMessage(MessageVO message){
 		return homeMapper.addMessage(message);
 	}
@@ -83,7 +89,7 @@ public class HomeService {
 	public int addToken(TokenVO token){
 		return homeMapper.addToken(token);
 	}
-	public List<TokenVO> getTokens(TokenVO token){
+	public List<GiveTokenVO> getTokens(GiveTokenVO token){
 		return homeMapper.getTokens(token);
 	}
 	//回调，检查交易数据,未打款，封号，1，待售，2，交易中，3，已完成。4，过期
@@ -94,17 +100,19 @@ public class HomeService {
 		List<BusinessVO> bs=homeMapper.getBusiness(business);
 		String status = bs.get(0).getStatus();
 		String userid = bs.get(0).getUserid();
-		if("2".equals(status)){//待交易，封号，创建新记录交易。
-			business.setStatus("4");//返回待交易状态
+		if("2".equals(status)){//待交易，封号，记录交易日志。
+			business.setStatus("1");//返回待交易状态
 			homeMapper.updateBusiness(business);
 			UserVO user=new UserVO();
 			user.setId(Integer.parseInt(userid));
 			user.setStatus("1");//无效账号
 			userMapper.updateUser(user);
+			//记录购买日志
 			BusinessVO newBs=new BusinessVO();
 			newBs.setUserid(bs.get(0).getUserid());
 			newBs.setSelljf(bs.get(0).getSelljf());
-			homeMapper.addBusiness(newBs);
+			newBs.setBuyerid(bs.get(0).getBuyerid());
+			homeMapper.addBusinessLog(newBs);
 		}
 	}
 	
@@ -576,8 +584,8 @@ public class HomeService {
 					back=d+"";
 				}else{
 					p.setStatus("2");//未中奖
-//					p.setWinjf("0");
-//					p.setGetjf("0");
+					p.setWinjf("0");
+					p.setGetjf("0");
 					double d=new Double(p.getBackjf());
 					back=d+"";
 				}

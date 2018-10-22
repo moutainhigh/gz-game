@@ -28,6 +28,7 @@ import com.zcc.game.utils.DateUtil;
 import com.zcc.game.utils.MD5Util;
 import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.DataVO;
+import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PailongVO;
@@ -482,7 +483,7 @@ public class HomeController extends BaseController{
 		        pool.setNowDay(CommonUtil.getDateStr());
 				List<PoolVO> pools = homeService.getWinData(pool);
 				if(pools.size()>0){
-					renderJson(request, response, SysCode.PARAM_IS_ERROR, "当天赢过不能再申请任务了");
+					renderJson(request, response, SysCode.PARAM_IS_ERROR, "当天赢过不能再下注了");
 		        	return;
 				}
 				
@@ -714,12 +715,12 @@ public class HomeController extends BaseController{
         	return;
         }
 		
-		TokenVO token=new TokenVO();
-		token.setUserid(userid);
+		GiveTokenVO token=new GiveTokenVO();
+		token.setPid(userid);
 		token.setAccount(account);
         try {
 	        //获取赠送秘钥列表
-	    	List<TokenVO> result = homeService.getTokens(token);
+	    	List<GiveTokenVO> result = homeService.getTokens(token);
 	    	renderJson(request, response, SysCode.SUCCESS, result);
         } catch (Exception e) {
         	e.printStackTrace();

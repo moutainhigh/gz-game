@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.DataVO;
+import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PailongVO;
@@ -30,6 +31,7 @@ public interface HomeMapper {
 	public List<BusinessVO> getBusiness(BusinessVO business);
 	public List<BusinessVO> getBuyJf(BusinessVO business);
 	public int addBusiness(BusinessVO business);
+	public int addBusinessLog(BusinessVO business);
 	public int updateBusiness(BusinessVO business);
 	
 	public int addTask(TaskVO task);
@@ -51,7 +53,7 @@ public interface HomeMapper {
 	
 	//赠送秘钥
 	public int addToken(TokenVO token);
-	public List<TokenVO> getTokens(TokenVO token);
+	public List<GiveTokenVO> getTokens(GiveTokenVO token);
 	public List<PailongVO> getPailong(PailongVO pailong);
 	
 }

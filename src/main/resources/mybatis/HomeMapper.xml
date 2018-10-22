@@ -87,6 +87,19 @@
 	#{selljf},1,now());
 	update gm_user_t set jfbusiness=jfbusiness-#{selljf} where id=#{userid}
  </insert> 
+  <!-- 添加挂卖历史  违约用户记录 -->
+ <insert id="addBusinessLog" useGeneratedKeys="true" keyProperty="id">
+ 	INSERT INTO gm_businesslog_t 
+	(userid,sellername,sellcard,sellweixin,sellali,buyerid,buyeraccount,selljf,STATUS,create_date)
+	VALUES (#{userid},
+	(SELECT username FROM gm_user_t WHERE id=#{userid}),
+	(SELECT bank_num FROM gm_user_t WHERE id=#{userid}),
+	(SELECT weixinpic FROM gm_user_t WHERE id=#{userid}),
+	(SELECT alipaypic FROM gm_user_t WHERE id=#{userid}),
+	#{buyerid},
+	(SELECT account FROM gm_user_t WHERE id=#{buyerid}),
+	#{selljf},0,now());
+ </insert> 
  <!-- 更新挂卖信息 -->
  <update id="updateBusiness">
  	update gm_business_t 
@@ -247,11 +260,11 @@
  	update gm_user_t set task_token=task_token+#{tokennum},lastup_date=now() where account=#{account}
  </insert>
  <!-- 查看秘钥赠送列表 -->
- <select id="getTokens" resultType="com.zcc.game.vo.TokenVO">
- 	select * from gm_token_t
+ <select id="getTokens" resultType="com.zcc.game.vo.GiveTokenVO">
+ 	select * from gm_givetoken_t
  	<where>
- 		<if test="userid!=null">
- 			and userid=#{userid}
+ 		<if test="pid!=null">
+ 			and pid=#{pid}
  		</if>
  		<if test="account != null">
  			and account=#{account}

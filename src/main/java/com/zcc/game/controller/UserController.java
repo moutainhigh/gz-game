@@ -152,15 +152,16 @@ public class UserController extends BaseController{
 	@RequestMapping("/register")
 //	@ResponseBody
 	public void register(HttpServletRequest request,HttpServletResponse response){
-		String[] paramKey = {"account","password","safepwd","jfzhuce","pid"};
+		String[] paramKey = {"account","password","safepwd","jfzhuce","pid","username"};
         Map<String, String> params = parseParams(request, "register", paramKey);
         String account = params.get("account");
         String password = params.get("password"); 
         String safepwd = params.get("safepwd"); 
         String jfzhuce = params.get("jfzhuce"); 
+        String username = params.get("username"); 
         String pid = params.get("pid"); 
     	
-        if(StringUtils.isEmpty(account) ||StringUtils.isEmpty(password) || 
+        if(StringUtils.isEmpty(account) ||StringUtils.isEmpty(password) || StringUtils.isEmpty(username) || 
         		StringUtils.isEmpty(safepwd)||StringUtils.isEmpty(jfzhuce) ||StringUtils.isEmpty(pid)){
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
@@ -198,7 +199,7 @@ public class UserController extends BaseController{
 			userVO.setJfold(jfzhuce);
 			userVO.setJfDiya(new Double(jfzhuce)*num/100);
 			userVO.setPid(Integer.parseInt(pid));
-			
+			userVO.setUsername(username);
 	        //注册
 	    	int result = userService.insertUser(userVO);
 	    	renderJson(request, response, SysCode.SUCCESS, result);
