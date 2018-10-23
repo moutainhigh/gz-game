@@ -19,8 +19,16 @@ public class BusinessVO {
 	private String status;
 	private String buyercard;
 	private String buyerid;
+	private String buyeraccount;
 	private Date create_date;
 	private Date lastup_date;
+	
+	public String getBuyeraccount() {
+		return buyeraccount;
+	}
+	public void setBuyeraccount(String buyeraccount) {
+		this.buyeraccount = buyeraccount;
+	}
 	public Integer getId() {
 		return id;
 	}
