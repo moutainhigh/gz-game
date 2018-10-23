@@ -58,7 +58,7 @@
  <!-- 查看挂卖信息 -->
  <select id="getBusiness" resultType="com.zcc.game.vo.BusinessVO">
  	SELECT *
- 	FROM gm_business_t 
+ 	FROM (SELECT * FROM gm_business_t ORDER BY id desc)t 
  	<where>
  		<if test="status!=null">
  			and status=#{status}
@@ -73,7 +73,7 @@
  			and id=#{id}
  		</if>
  	</where>
- 	order by create_date desc
+ 	order by status
  </select>
  <!-- 添加挂卖 -->
  <insert id="addBusiness" useGeneratedKeys="true" keyProperty="id">
@@ -110,6 +110,7 @@
  		<if test="buyerid != null">
  			buyerid=#{buyerid},
  			buyercard=(SELECT bank_num FROM gm_user_t WHERE id=#{buyerid}),
+ 			buyeraccount=(SELECT account FROM gm_user_t WHERE id=#{buyerid}),
  		</if>
  		<if test="buytime != null">
  			buytime=#{buytime},
