@@ -72,6 +72,9 @@
  		<if test="id != null">
  			and id=#{id}
  		</if>
+ 		<if test="active != null">
+ 			and active=#{active}
+ 		</if>
  	</where>
  	order by status
  </select>
