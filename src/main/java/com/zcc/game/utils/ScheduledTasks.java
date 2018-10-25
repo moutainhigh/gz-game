@@ -26,7 +26,7 @@ public class ScheduledTasks {
 	private HomeService homeService;
 	
 	
-	@Scheduled(cron = "0/10 * * * * ?")  //cron接受cron表达式，根据cron表达式确定定时规则
+//	@Scheduled(cron = "0/10 * * * * ?")  //cron接受cron表达式，根据cron表达式确定定时规则
     public void testCron() {
         System.out.println("time:"+new Date());
         homeService.taskData();

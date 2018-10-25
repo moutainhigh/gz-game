@@ -20,9 +20,17 @@ public class BusinessVO {
 	private String buyercard;
 	private String buyerid;
 	private String buyeraccount;
+	private String active;
 	private Date create_date;
 	private Date lastup_date;
 	
+	
+	public String getActive() {
+		return active;
+	}
+	public void setActive(String active) {
+		this.active = active;
+	}
 	public String getBuyeraccount() {
 		return buyeraccount;
 	}

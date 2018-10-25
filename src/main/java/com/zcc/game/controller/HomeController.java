@@ -144,6 +144,7 @@ public class HomeController extends BaseController{
         
         BusinessVO business = new BusinessVO();
         business.setStatus(status);
+        business.setActive("0");//查看有效的数据
         if("1".equals(type)){//挂卖信息
         	business.setUserid(userid);
         }else{//购买信息
