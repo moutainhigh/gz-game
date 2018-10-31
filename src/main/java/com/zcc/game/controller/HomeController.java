@@ -338,6 +338,15 @@ public class HomeController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
+		//检查是否有在途的单据（未审批）
+		TaskVO taskVO=new TaskVO();
+		taskVO.setUserid(userid);
+		taskVO.setStatus("1");//待审核
+		List<TaskVO> tasks = homeService.getTaskByStatus(taskVO);
+		if(tasks.size()>0){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "您已经有申请过正在审核");
+        	return;
+		}
 		//校验今天--是否有赢过
 		PoolVO pool = new PoolVO();
         pool.setStatus("1");//赢的记录
@@ -360,6 +369,11 @@ public class HomeController extends BaseController{
 		int taskNum =users.get(0).getTaskToken();
 		if(taskNum<=0){
 			renderJson(request, response, SysCode.PARAM_IS_ERROR, "秘钥不足");
+        	return;
+		}
+		double protask=users.get(0).getPrejftask();
+		if(protask>0){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "您申请的积分尚未转换到中心积分");
         	return;
 		}
 		//是否自动审批通过

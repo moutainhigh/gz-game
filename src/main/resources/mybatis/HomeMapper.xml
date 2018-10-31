@@ -83,7 +83,7 @@
  	INSERT INTO gm_business_t 
 	(userid,sellername,sellcard,sellweixin,sellali,selljf,STATUS,create_date)
 	VALUES (#{userid},
-	(SELECT username FROM gm_user_t WHERE id=#{userid}),
+	(SELECT account FROM gm_user_t WHERE id=#{userid}),
 	(SELECT bank_num FROM gm_user_t WHERE id=#{userid}),
 	(SELECT weixinpic FROM gm_user_t WHERE id=#{userid}),
 	(SELECT alipaypic FROM gm_user_t WHERE id=#{userid}),
@@ -162,6 +162,12 @@
  	FROM gm_task_t 
  	where userid=#{userid} and (status=2 or status=1)
  </select>
+ <select id="getTaskByStatus" resultType="com.zcc.game.vo.TaskVO">
+ 	SELECT *
+ 	FROM gm_task_t 
+ 	where userid=#{userid} and status=#{status}
+ </select>
+ 
   <!-- 查看中奖信息 -->
  <select id="getData" resultType="com.zcc.game.vo.DataVO">
  	SELECT *

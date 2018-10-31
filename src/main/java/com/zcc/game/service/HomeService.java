@@ -175,7 +175,9 @@ public class HomeService {
 	public List<TaskVO> getTask(TaskVO task){
 		return homeMapper.getTask(task);
 	}
-	
+	public List<TaskVO> getTaskByStatus(TaskVO task){
+		return homeMapper.getTaskByStatus(task);
+	}
 	//开奖信息
 	public int addData(DataVO task) throws Exception{
 		int num = homeMapper.addData(task);
