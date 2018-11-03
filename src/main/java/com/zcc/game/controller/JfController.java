@@ -69,10 +69,10 @@ public class JfController extends BaseController{
         	user.setJfbusiness(jfrale);
         }else if("3".equals(type) && jfrale<=zhuce){//(注册->任务)
         	//要有预申请的任务积分
-        	if(users.get(0).getVersion()>0 && users.get(0).getVersion()==Integer.parseInt(jf)){
+        	if(users.get(0).getPrejftask()>0 && users.get(0).getPrejftask()==Integer.parseInt(jf)){
         		user.setJfzhuce(-jfrale);
             	user.setJftask(jfrale);
-            	user.setVersion(new Double(0));
+            	user.setPrejftask(new Double(0));
         	}else{
         		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
             	return;
@@ -89,7 +89,7 @@ public class JfController extends BaseController{
         	if(users.get(0).getVersion()>0 && users.get(0).getVersion()==Integer.parseInt(jf)){
         		user.setJfcenter(-jfrale);
             	user.setJftask(jfrale);
-            	user.setVersion(new Double(0));
+            	user.setPrejftask(new Double(0));
         	}else{
         		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
             	return;
