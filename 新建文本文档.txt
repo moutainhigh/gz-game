@@ -1,0 +1,11 @@
+green:
+使用Goldengate从Oracle增量同步到MongoDB配置很简单，参考：参考：参考：https://www.cnblogs.com/margiex/p/8078571.html
+
+green:
+https://blog.csdn.net/kk185800961/article/details/53426348
+
+green:
+https://docs.oracle.com/goldengate/bd123010/gg-bd/GADBD/GUID-084CCCD6-8D13-43C0-A6C4-4D2AC8B8FA86.htm#GADBD-GUID-37E9FAE8-120D-4FA7-A796-B8866812F108
+
+green:
+https://www.oracle.com/technetwork/cn/articles/datawarehouse/oracle-sqlserver-goldengate-1396114-zhs.html
