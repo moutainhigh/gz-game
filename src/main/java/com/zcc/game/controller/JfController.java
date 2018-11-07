@@ -86,7 +86,7 @@ public class JfController extends BaseController{
         	chnageCenter.setType("转出");
         }else if("5".equals(type) && jfrale<=center){//(中心->任务)
         	//要有预申请的任务积分
-        	if(users.get(0).getVersion()>0 && users.get(0).getVersion()==Integer.parseInt(jf)){
+        	if(users.get(0).getPrejftask()>0 && users.get(0).getPrejftask()==Integer.parseInt(jf)){
         		user.setJfcenter(-jfrale);
             	user.setJftask(jfrale);
             	user.setPrejftask(new Double(0));
