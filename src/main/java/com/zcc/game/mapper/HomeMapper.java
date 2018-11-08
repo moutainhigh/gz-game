@@ -29,6 +29,9 @@ public interface HomeMapper {
 	public List<NoticeVO> getNotices(NoticeVO user);
 	public List<PoolVO> getWinData(PoolVO poolVO);
 	public List<BusinessVO> getBusiness(BusinessVO business);
+	public List<BusinessVO> getBusinessBySell(BusinessVO business);
+	
+	
 	public List<BusinessVO> getBuyJf(BusinessVO business);
 	public int addBusiness(BusinessVO business);
 	public int addBusinessLog(BusinessVO business);

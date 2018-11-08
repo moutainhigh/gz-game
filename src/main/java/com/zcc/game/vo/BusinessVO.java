@@ -24,7 +24,15 @@ public class BusinessVO {
 	private Date create_date;
 	private Date lastup_date;
 	
+	private Integer count;
 	
+	
+	public Integer getCount() {
+		return count;
+	}
+	public void setCount(Integer count) {
+		this.count = count;
+	}
 	public String getActive() {
 		return active;
 	}

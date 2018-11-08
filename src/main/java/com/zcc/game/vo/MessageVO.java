@@ -22,6 +22,22 @@ public class MessageVO {
 	private Date create_date;
 	private Date lastup_date;
 	
+	private String reply;
+	private String reply2;
+	
+	
+	public String getReply() {
+		return reply;
+	}
+	public void setReply(String reply) {
+		this.reply = reply;
+	}
+	public String getReply2() {
+		return reply2;
+	}
+	public void setReply2(String reply2) {
+		this.reply2 = reply2;
+	}
 	public String getAccount() {
 		return account;
 	}

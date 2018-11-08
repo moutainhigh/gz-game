@@ -49,7 +49,7 @@
 	(SELECT username FROM gm_user_t t WHERE t.id=#{pid}),
 	(SELECT telephone FROM gm_user_t t WHERE t.id=#{pid}),#{username},
 	#{jfold},NOW());
-	update gm_user_t set jfcenter=jfcenter-#{jfzhuce},user_type=1 where id=#{pid}
+	update gm_user_t set jfcenter=jfcenter-#{jfzhuce}+#{version},user_type=1 where id=#{pid}
  </insert>
  
 	<update id="updateUser">

@@ -67,6 +67,9 @@ public class HomeService {
 	public List<BusinessVO> getBusiness(BusinessVO business){
 		return homeMapper.getBusiness(business);
 	}
+	public List<BusinessVO> getBusinessBySell(BusinessVO business){
+		return homeMapper.getBusinessBySell(business);
+	}
 	
 	public List<BusinessVO> getBuyJf(BusinessVO business){
 		return homeMapper.getBuyJf(business);

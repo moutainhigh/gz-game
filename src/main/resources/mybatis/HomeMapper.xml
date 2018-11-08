@@ -78,6 +78,14 @@
  	</where>
  	order by status
  </select>
+ <!-- add by zcc 181108 -->
+ <!-- 查看挂卖信息 随机显示count条 -->
+ <select id="getBusinessBySell" resultType="com.zcc.game.vo.BusinessVO">
+ 	SELECT * FROM gm_business_t 
+ 	where status=1
+ 	limit #{count}
+ </select>
+ 
  <!-- 添加挂卖 -->
  <insert id="addBusiness" useGeneratedKeys="true" keyProperty="id">
  	INSERT INTO gm_business_t 

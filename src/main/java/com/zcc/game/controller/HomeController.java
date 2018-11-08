@@ -165,6 +165,35 @@ public class HomeController extends BaseController{
 		}
 	}
     
+	//获取挂卖信息
+	@RequestMapping("/getBusinessBySell")
+	public void getBusinessBySell(HttpServletRequest request,HttpServletResponse response){
+		String[] paramKey = {};
+		Map<String, String> params = parseParams(request, "getBusinessBySell", paramKey);
+        
+        BusinessVO business = new BusinessVO();
+        business.setCount(10);
+        ParamVO param=new ParamVO();
+        param.setNumber("007");//获取后台配置随机展示数量
+        param=userService.getParam(param);
+        if(param.getData()!=null && !"".equals(param.getData())){
+        	business.setCount(Integer.parseInt(param.getData()));
+        }
+        try {
+	        //获取挂卖信息
+	    	List<BusinessVO> result = homeService.getBusinessBySell(business);
+	    	if(result !=null && result.size()>0){
+	    		renderJson(request, response, SysCode.SUCCESS, result);
+			}else{
+				renderJson(request, response, SysCode.SUCCESS, result);
+			}
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getBusinessBySell()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+		
 	//获取购买积分信息（显示其他人的）
 		@RequestMapping("/getBuyJf")
 		public void getBuyJf(HttpServletRequest request,HttpServletResponse response){
@@ -374,6 +403,12 @@ public class HomeController extends BaseController{
 		double protask=users.get(0).getPrejftask();
 		if(protask>0){
 			renderJson(request, response, SysCode.PARAM_IS_ERROR, "您申请的积分尚未转换到中心积分");
+        	return;
+		}
+//		add by zcc 新增需求
+		double taskjf=users.get(0).getJftask();
+		if(taskjf>0){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "尚有任务积分未消费");
         	return;
 		}
 		//是否自动审批通过

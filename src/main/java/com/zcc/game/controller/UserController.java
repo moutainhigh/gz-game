@@ -183,12 +183,17 @@ public class UserController extends BaseController{
 			if(param.getData()!=null){
 				num=Integer.parseInt(param.getData());
 			}
+			
 			//判断父类积分是否够扣减
 			UserVO parent = new UserVO();
 			parent.setId(Integer.parseInt(pid));
 			List<UserVO> list = userService.getUsers(parent);
 	        if(list==null || list.size()<=0 || list.get(0).getJfcenter()<new Double(jfzhuce)){
 	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足");//用户名已注册
+				return;
+	        }
+	        if(list.get(0).getJfzhuce().equals(new Double(list.get(0).getJfold()))){
+	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "注册积分必须和原注册积分相等");//注册积分必须和原注册积分相等
 				return;
 	        }
 	        
@@ -200,6 +205,14 @@ public class UserController extends BaseController{
 			userVO.setJfDiya(new Double(jfzhuce)*num/100);
 			userVO.setPid(Integer.parseInt(pid));
 			userVO.setUsername(username);
+			
+			param.setNumber("006");//注册积分返还上级
+			param = userService.getParam(param);
+			double backjf=0;
+			if(param.getData()!=null){
+				backjf=Integer.parseInt(param.getData())*zhucejf/100;
+			}
+			userVO.setVersion(backjf);
 	        //注册
 	    	int result = userService.insertUser(userVO);
 	    	renderJson(request, response, SysCode.SUCCESS, result);
