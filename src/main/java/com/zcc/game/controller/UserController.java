@@ -39,6 +39,7 @@ import com.zcc.game.common.UploadType;
 import com.zcc.game.service.ImageService;
 import com.zcc.game.service.UserService;
 import com.zcc.game.utils.MD5Util;
+import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.UserVO;
@@ -447,6 +448,44 @@ public class UserController extends BaseController{
     		
     		//更新——完善信息
             int	result = userService.updateUser(userVO);
+            renderJson(request, response, SysCode.SUCCESS, imageUrls.get(0));
+//		} catch (Exception e) {
+//			logger.error("上传用户图像失败:"+e.getMessage(), e);
+//			renderJson(request, response, SysCode.SYS_ERR, "上传用户图像失败:");
+//		}
+	}
+	
+	/**
+	 * 上传——凭证图片
+	 * @param request
+	 * @param response
+	 * @throws FileUploadException 
+	 * @throws IOException 
+	 */
+	@RequestMapping("uploadVoucher")
+	public void uploadVoucher(HttpServletRequest request, HttpServletResponse response,@RequestParam MultipartFile[] file) throws Exception{
+		String[] paramKey = {"businessId"};
+        Map<String, String> params = parseParams(request, "updateImage", paramKey);
+        String businessId = params.get("businessId");
+        if(StringUtils.isEmpty(businessId)){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+        //1 头像
+//        try {
+			//上传图片并获取路径
+//        	List<String> imageUrls = imageService.upload(request, UploadType.USER_PIC);
+        	List<String> imageUrls =fileUpload(file);
+        	if(imageUrls==null || imageUrls.size()==0){
+        		renderJson(request, response,  SysCode.SYS_ERR, null);
+        		return;
+        	}
+        	
+        	BusinessVO business=new BusinessVO();
+        	business.setId(Integer.parseInt(businessId));
+        	business.setVoucher(imageUrls.get(0));
+    		//更新——完善信息
+            int	result = userService.updateBusiness(business);
             renderJson(request, response, SysCode.SUCCESS, imageUrls.get(0));
 //		} catch (Exception e) {
 //			logger.error("上传用户图像失败:"+e.getMessage(), e);

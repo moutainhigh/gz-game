@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zcc.game.mapper.UserMapper;
+import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.ChangeCenterVO;
 import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.ParamVO;
@@ -40,6 +41,10 @@ public class UserService {
 	public int updateUser(UserVO user){
 		return userMapper.updateUser(user);
 	}
+	public int updateBusiness(BusinessVO user){
+		return userMapper.updateBusiness(user);
+	}
+	
 	@Transactional
 	public int updateUser(UserVO user,ChangeCenterVO chnageCenter){
 		//写入中心积分转换日志

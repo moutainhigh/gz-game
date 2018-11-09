@@ -21,12 +21,26 @@ public class BusinessVO {
 	private String buyerid;
 	private String buyeraccount;
 	private String active;
+	private String voucher;
+	private String remark;
 	private Date create_date;
 	private Date lastup_date;
 	
 	private Integer count;
 	
 	
+	public String getVoucher() {
+		return voucher;
+	}
+	public void setVoucher(String voucher) {
+		this.voucher = voucher;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 	public Integer getCount() {
 		return count;
 	}

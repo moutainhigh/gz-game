@@ -52,6 +52,21 @@
 	update gm_user_t set jfcenter=jfcenter-#{jfzhuce}+#{version},user_type=1 where id=#{pid}
  </insert>
  
+ <update id="updateBusiness">
+		UPDATE gm_business_t  
+		<set>
+			<if test="voucher != null">
+				voucher=#{voucher},
+			</if>
+			lastup_date=NOW()
+		</set>
+		<where>
+			<if test="id != null">
+				and id=#{id}
+			</if>
+		</where>
+	</update>
+	
 	<update id="updateUser">
 		UPDATE gm_user_t  
 		<set>

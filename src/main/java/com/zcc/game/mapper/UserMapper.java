@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.ChangeCenterVO;
 import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.ParamVO;
@@ -25,6 +26,7 @@ public interface UserMapper {
 	public List<UserVO> getChilds(UserVO user);
 	public int insertUser(UserVO user);
 	public int updateUser(UserVO user);
+	public int updateBusiness(BusinessVO user);
 	public int gaveToken(UserVO user);
 	
 
