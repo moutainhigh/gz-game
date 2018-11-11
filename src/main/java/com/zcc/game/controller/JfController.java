@@ -67,7 +67,8 @@ public class JfController extends BaseController{
         }else if("2".equals(type) && jfrale<=zhuce){//(注册->交易)--需求变更为：--(中心->注册)
         	user.setJfcenter(-jfrale);
         	user.setJfzhuce(jfrale);
-        }else if("3".equals(type) && jfrale<=zhuce){//(注册->任务)
+//        }
+//        else if("3".equals(type) && jfrale<=zhuce){//(注册->任务)
         	//要有预申请的任务积分
 //        	if(users.get(0).getPrejftask()>0 && users.get(0).getPrejftask().equals(new Double(jf))){
 //        		user.setJfzhuce(-jfrale);
@@ -78,7 +79,7 @@ public class JfController extends BaseController{
 //            	return;
 //        	}
         }else if("4".equals(type) && jfrale<=center){//(中心->交易)
-        	if(users.get(0).getJfzhuce().equals(new Double(users.get(0).getJfold()))){
+        	if(!users.get(0).getJfzhuce().equals(new Double(users.get(0).getJfold()))){
 	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "注册积分必须和原注册积分相等");//注册积分必须和原注册积分相等
 				return;
 	        }

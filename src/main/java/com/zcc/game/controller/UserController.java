@@ -193,7 +193,7 @@ public class UserController extends BaseController{
 	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足");//用户名已注册
 				return;
 	        }
-	        if(list.get(0).getJfzhuce().equals(new Double(list.get(0).getJfold()))){
+	        if(!list.get(0).getJfzhuce().equals(new Double(list.get(0).getJfold()))){
 	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "注册积分必须和原注册积分相等");//注册积分必须和原注册积分相等
 				return;
 	        }
