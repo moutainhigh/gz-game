@@ -97,7 +97,7 @@ public class JfController extends BaseController{
             	user.setJftask(jfrale);
             	user.setPrejftask(new Double(0));
         	}else{
-        		renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        		renderJson(request, response, SysCode.PARAM_IS_ERROR, "没有预申请任务积分");
             	return;
         	}
         	chnageCenter.setUserid(userId);
