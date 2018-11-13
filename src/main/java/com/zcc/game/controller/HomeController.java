@@ -378,14 +378,23 @@ public class HomeController extends BaseController{
 		}
 		//校验今天--是否有赢过
 		PoolVO pool = new PoolVO();
-        pool.setStatus("1");//赢的记录
+//        pool.setStatus("1");//赢的记录
         pool.setUserid(userid);
         pool.setAfterDay(CommonUtil.getAfterDate());
         pool.setNowDay(CommonUtil.getDateStr());
 		List<PoolVO> list = homeService.getWinData(pool);
+		boolean iswin=false;
 		if(list.size()>0){
-			renderJson(request, response, SysCode.PARAM_IS_ERROR, "当天赢过不能再申请任务了");
-        	return;
+			for (int i = 0; i < list.size(); i++) {
+				if(!"2".equals(list.get(i).getStatus())){
+					iswin=true;
+					break;
+				}
+			}
+			if(iswin){
+				renderJson(request, response, SysCode.PARAM_IS_ERROR, "当天赢过不能再申请任务了");
+	        	return;
+			}
 		}
 		//验证是否还有足够的秘钥
 		UserVO user =new UserVO();
