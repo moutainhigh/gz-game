@@ -384,15 +384,22 @@ public class HomeController extends BaseController{
         pool.setNowDay(CommonUtil.getDateStr());
 		List<PoolVO> list = homeService.getWinData(pool);
 		boolean iswin=false;
+		boolean waitwin=false;
 		if(list.size()>0){
 			for (int i = 0; i < list.size(); i++) {
-				if(!"2".equals(list.get(i).getStatus())){
+				if("0".equals(list.get(i).getStatus())){
+					waitwin=true;
+				}
+				if("1".equals(list.get(i).getStatus())){
 					iswin=true;
-					break;
 				}
 			}
-			if(iswin){
+			if(iswin){//赢过当天不能再申请任务
 				renderJson(request, response, SysCode.PARAM_IS_ERROR, "当天赢过不能再申请任务了");
+	        	return;
+			}
+			if(waitwin){//赢过当天不能再申请任务
+				renderJson(request, response, SysCode.PARAM_IS_ERROR, "请开奖后再进行任务申请");
 	        	return;
 			}
 		}
