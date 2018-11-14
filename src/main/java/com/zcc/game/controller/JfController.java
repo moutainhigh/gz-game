@@ -64,7 +64,7 @@ public class JfController extends BaseController{
         	chnageCenter.setNum(jfrale+"");
         	chnageCenter.setStatus("积分转换");
         	chnageCenter.setType("转入");
-        }else if("2".equals(type) && jfrale<=zhuce){//(注册->交易)--需求变更为：--(中心->注册)
+        }else if("2".equals(type) && jfrale<=center){//(注册->交易)--需求变更为：--(中心->注册)
         	user.setJfcenter(-jfrale);
         	user.setJfzhuce(jfrale);
 //        }
