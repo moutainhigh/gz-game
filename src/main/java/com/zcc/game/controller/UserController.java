@@ -248,10 +248,15 @@ public class UserController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, "没有该用户");
         	return;
         }
+        if(users.get(0)!=null && users.get(0).getVersion()>new Double(0)){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "该用户已经修改过,不能再修改！");
+        	return;
+        }
         user.setTelephone(telephone);
         user.setBankName(bankname);
         user.setBankNum(banknum);
         user.setUsername(username);
+        user.setVersion(new Double(1));//修改过，不能再修改。
         int result =0;
         try {
 	        //更新
