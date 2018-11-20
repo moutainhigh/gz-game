@@ -433,6 +433,14 @@ public class UserController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
+        UserVO user =new UserVO();
+        user.setId(Integer.parseInt(userId));
+        List<UserVO> users = userService.getUsers(user);
+        if(users.get(0)!=null && users.get(0).getVersion()>new Double(0)){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "该用户已经修改过,不能再修改！");
+        	return;
+        }
+        
         //1 头像
 //        try {
 			//上传图片并获取路径
