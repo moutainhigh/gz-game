@@ -422,7 +422,7 @@ public class HomeController extends BaseController{
         	return;
 		}
 //		add by zcc 新增需求
-		double taskjf=users.get(0).getJftask();
+		double taskjf=users.get(0).getJftask()==null?0:users.get(0).getJftask();
 		if(taskjf>0){
 			renderJson(request, response, SysCode.PARAM_IS_ERROR, "尚有任务积分未消费");
         	return;
