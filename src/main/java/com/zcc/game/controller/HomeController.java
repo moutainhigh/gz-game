@@ -434,7 +434,9 @@ public class HomeController extends BaseController{
 		param = userService.getParam(param);
 		if("1".equals(param.getAuto())){//0手动、1自动
 			status="2";//审批通过
-			task.setTaskjf(param.getData());//后台设置
+			//计算任务积分
+			double d=new Double(param.getData())/100*new Double(users.get(0).getJfold());
+			task.setTaskjf(String.valueOf(d));//后台设置
 		}
         task.setUserid(userid);
         task.setStatus(status);
