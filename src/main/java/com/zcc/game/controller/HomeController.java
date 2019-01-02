@@ -1,5 +1,8 @@
 package com.zcc.game.controller;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -398,10 +401,10 @@ public class HomeController extends BaseController{
 				renderJson(request, response, SysCode.PARAM_IS_ERROR, "当天赢过不能再申请任务了");
 	        	return;
 			}
-			if(waitwin){//赢过当天不能再申请任务
-				renderJson(request, response, SysCode.PARAM_IS_ERROR, "请开奖后再进行任务申请");
-	        	return;
-			}
+//			if(waitwin){//赢过当天不能再申请任务
+//				renderJson(request, response, SysCode.PARAM_IS_ERROR, "请开奖后再进行任务申请");
+//	        	return;
+//			}
 		}
 		//验证是否还有足够的秘钥
 		UserVO user =new UserVO();
@@ -436,7 +439,10 @@ public class HomeController extends BaseController{
 			status="2";//审批通过
 			//计算任务积分
 			double d=new Double(param.getData())/100*new Double(users.get(0).getJfold());
-			task.setTaskjf(String.valueOf(d));//后台设置
+			BigDecimal bg = new BigDecimal(d);
+            double f1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            System.out.println(f1+"");
+			task.setTaskjf(f1+"");//后台设置
 		}
         task.setUserid(userid);
         task.setStatus(status);
