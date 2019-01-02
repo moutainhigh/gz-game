@@ -401,10 +401,10 @@ public class HomeController extends BaseController{
 				renderJson(request, response, SysCode.PARAM_IS_ERROR, "当天赢过不能再申请任务了");
 	        	return;
 			}
-//			if(waitwin){//赢过当天不能再申请任务
-//				renderJson(request, response, SysCode.PARAM_IS_ERROR, "请开奖后再进行任务申请");
-//	        	return;
-//			}
+			if(waitwin){//赢过当天不能再申请任务
+				renderJson(request, response, SysCode.PARAM_IS_ERROR, "请开奖后再进行任务申请");
+	        	return;
+			}
 		}
 		//验证是否还有足够的秘钥
 		UserVO user =new UserVO();
