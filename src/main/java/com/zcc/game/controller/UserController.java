@@ -557,7 +557,7 @@ public class UserController extends BaseController{
 		String image4 = params.get("image4"); 
 		String image5 = params.get("image5"); 
 		
-		if(StringUtils.isBlank(content) || StringUtils.isBlank(userid) ||StringUtils.isBlank(msgId)){//userID不能为空
+		if(StringUtils.isBlank(content) ||StringUtils.isBlank(msgId)){//userID不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
