@@ -36,12 +36,14 @@ import com.alibaba.fastjson.JSON;
 import com.zcc.game.common.CommonUtil;
 import com.zcc.game.common.SysCode;
 import com.zcc.game.common.UploadType;
+import com.zcc.game.mapper.UserMapper;
 import com.zcc.game.service.ImageService;
 import com.zcc.game.service.UserService;
 import com.zcc.game.utils.MD5Util;
 import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.ParamVO;
+import com.zcc.game.vo.ReplyVO;
 import com.zcc.game.vo.UserVO;
 
 /**
@@ -507,6 +509,91 @@ public class UserController extends BaseController{
 	}
 	
 	/**
+	 * 上传——回复图片
+	 * @param request
+	 * @param response
+	 * @throws FileUploadException 
+	 * @throws IOException 
+	 */
+	@RequestMapping("uploadImageReply")
+	public void uploadImageReply(HttpServletRequest request, HttpServletResponse response,@RequestParam MultipartFile[] file) throws Exception{
+		String[] paramKey = {""};
+        Map<String, String> params = parseParams(request, "uploadImageReply", paramKey);
+        //1 头像
+//        try {
+			//上传图片并获取路径
+//        	List<String> imageUrls = imageService.upload(request, UploadType.USER_PIC);
+        	List<String> imageUrls =fileUpload(file);
+        	if(imageUrls==null || imageUrls.size()==0){
+        		renderJson(request, response,  SysCode.SYS_ERR, null);
+        		return;
+        	}
+        	
+//        	BusinessVO business=new BusinessVO();
+//        	business.setId(Integer.parseInt(businessId));
+//        	business.setVoucher(imageUrls.get(0));
+//    		//更新——完善信息
+//            int	result = userService.updateBusiness(business);
+            renderJson(request, response, SysCode.SUCCESS, imageUrls.get(0));
+//		} catch (Exception e) {
+//			logger.error("上传用户图像失败:"+e.getMessage(), e);
+//			renderJson(request, response, SysCode.SYS_ERR, "上传用户图像失败:");
+//		}
+	}
+	
+	//增添回复
+	@RequestMapping("/addReply")
+	public void addReply(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"image1","userid","content","image2","image3","image4","image5"};
+		Map<String, String> params = parseParams(request, "addReply", paramKey);
+		String content = params.get("content"); 
+		String userid = params.get("userid"); 
+		String image1 = params.get("image1"); 
+		String image2 = params.get("image2"); 
+		String image3 = params.get("image3"); 
+		String image4 = params.get("image4"); 
+		String image5 = params.get("image5"); 
+		
+		if(StringUtils.isBlank(content) || StringUtils.isBlank(userid) ){//userID不能为空
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+		UserVO user=new UserVO();
+		user.setId(Integer.valueOf(userid));
+		List<UserVO> userList = userService.getUsers(user);
+		if(userList==null || userList.size()<=0){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "用户ID无效");
+        	return;
+		}
+		//新需求， add by zcc 2019-01-07
+		ReplyVO reply=new ReplyVO();
+		reply.setUserid(userid);
+		reply.setContent(content);
+		reply.setType("客户回复");
+		reply.setImage1(image1);
+		reply.setImage2(image2);
+		reply.setImage3(image3);
+		reply.setImage4(image4);
+		reply.setImage5(image5);
+		
+       
+        try {
+	        //添加回复
+	    	int result = userService.addReply(reply);
+	    	if(result ==1){
+	    		renderJson(request, response, SysCode.SUCCESS, result);
+			}else{
+				renderJson(request, response, SysCode.SUCCESS, result);
+			}
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````addReply()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+		
+	/**
 	 * 上传文件
 	 * @param file
 	 * @return
@@ -552,66 +639,66 @@ public class UserController extends BaseController{
 			return urls;
 		}  
 	}
-
-	@RequestMapping("/upload")
-	@ResponseBody
-	public void testUploadFile(HttpServletRequest req,HttpServletResponse response,MultipartHttpServletRequest multiReq) throws IOException{
-//		List<String> urls = new ArrayList<String>();
-//		Map<String, Object> result = new HashMap<String, Object>();
-//		
-//		try {
-//			for(MultipartFile myfile : file){  
-//			        if(myfile.isEmpty()){  
-//			        	logger.warn("文件未上传");  
-//			        }else{  
-//			            logger.debug("文件长度: " + myfile.getSize());  
-//			            logger.debug("文件类型: " + myfile.getContentType());  
-//			            logger.debug("文件名称: " + myfile.getName());  
-//			            logger.debug("文件原名: " + myfile.getOriginalFilename());  
-//			            String ext =  FilenameUtils.getExtension(myfile.getOriginalFilename());
-//			            String reName = RandomStringUtils.randomAlphanumeric(32).toLowerCase() + "."+ ext;
-//			            String cdate = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-////			            String realPath = request.getSession().getServletContext().getRealPath("/upload")+ File.separator +cdate; 
-//			            String realPath = "D:\\projects\\bak\\springboot-adminlte-admin-master\\src\\main\\resources\\upload"+ File.separator +cdate; 
-//			            FileUtils.copyInputStreamToFile(myfile.getInputStream(), new File(realPath, reName)); 
-//			            urls.add("/upload/"+cdate+"/"+reName);
-//			        }  
-//			    }
-//			result.put("status", "success");
-//			result.put("urls",urls);
-//			return result;
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			result.put("status", "error");
-//			return result;
-//		}  
-//		String path="/home/upload/1.jpg";
-		String[] paramKey = {"userId","type"};
-        Map<String, String> params = parseParams(req, "update", paramKey);
-        
-		System.out.println("开始上传文件：·······"+multiReq.getFile("file").getOriginalFilename());
-		String ext =  FilenameUtils.getExtension(multiReq.getFile("file").getOriginalFilename());
-        String reName = RandomStringUtils.randomAlphanumeric(32).toLowerCase() + "."+ ext;
-        String cdate = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-		String path="/usr/local/nginx/html/pic/"+cdate;
-		if(!new File(path).exists()){
-			new File(path).mkdir();
-			System.out.println("创建路径：·······"+path);
-		}
-//		"F:\\upload\\1.jpg"
-		FileOutputStream fos=new FileOutputStream(new File(path+File.separator+reName));
-		FileInputStream in = (FileInputStream) multiReq.getFile("file").getInputStream();
-		byte [] b=new byte[1024];
-		int len=0;
-		while ((len=in.read(b))!=-1) {
-			fos.write(b, 0, len);
-		}
-		fos.close();
-		in.close();
-		System.out.println("上传完成：·······"+path);
-		renderJson(req, response, SysCode.SUCCESS, "pic/"+cdate+File.separator+reName);
-//		return "pic/"+cdate+File.separator+reName;
-	}
+//
+//	@RequestMapping("/upload")
+//	@ResponseBody
+//	public void testUploadFile(HttpServletRequest req,HttpServletResponse response,MultipartHttpServletRequest multiReq) throws IOException{
+////		List<String> urls = new ArrayList<String>();
+////		Map<String, Object> result = new HashMap<String, Object>();
+////		
+////		try {
+////			for(MultipartFile myfile : file){  
+////			        if(myfile.isEmpty()){  
+////			        	logger.warn("文件未上传");  
+////			        }else{  
+////			            logger.debug("文件长度: " + myfile.getSize());  
+////			            logger.debug("文件类型: " + myfile.getContentType());  
+////			            logger.debug("文件名称: " + myfile.getName());  
+////			            logger.debug("文件原名: " + myfile.getOriginalFilename());  
+////			            String ext =  FilenameUtils.getExtension(myfile.getOriginalFilename());
+////			            String reName = RandomStringUtils.randomAlphanumeric(32).toLowerCase() + "."+ ext;
+////			            String cdate = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+//////			            String realPath = request.getSession().getServletContext().getRealPath("/upload")+ File.separator +cdate; 
+////			            String realPath = "D:\\projects\\bak\\springboot-adminlte-admin-master\\src\\main\\resources\\upload"+ File.separator +cdate; 
+////			            FileUtils.copyInputStreamToFile(myfile.getInputStream(), new File(realPath, reName)); 
+////			            urls.add("/upload/"+cdate+"/"+reName);
+////			        }  
+////			    }
+////			result.put("status", "success");
+////			result.put("urls",urls);
+////			return result;
+////		} catch (Exception e) {
+////			// TODO Auto-generated catch block
+////			e.printStackTrace();
+////			result.put("status", "error");
+////			return result;
+////		}  
+////		String path="/home/upload/1.jpg";
+//		String[] paramKey = {"userId","type"};
+//        Map<String, String> params = parseParams(req, "update", paramKey);
+//        
+//		System.out.println("开始上传文件：·······"+multiReq.getFile("file").getOriginalFilename());
+//		String ext =  FilenameUtils.getExtension(multiReq.getFile("file").getOriginalFilename());
+//        String reName = RandomStringUtils.randomAlphanumeric(32).toLowerCase() + "."+ ext;
+//        String cdate = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+//		String path="/usr/local/nginx/html/pic/"+cdate;
+//		if(!new File(path).exists()){
+//			new File(path).mkdir();
+//			System.out.println("创建路径：·······"+path);
+//		}
+////		"F:\\upload\\1.jpg"
+//		FileOutputStream fos=new FileOutputStream(new File(path+File.separator+reName));
+//		FileInputStream in = (FileInputStream) multiReq.getFile("file").getInputStream();
+//		byte [] b=new byte[1024];
+//		int len=0;
+//		while ((len=in.read(b))!=-1) {
+//			fos.write(b, 0, len);
+//		}
+//		fos.close();
+//		in.close();
+//		System.out.println("上传完成：·······"+path);
+//		renderJson(req, response, SysCode.SUCCESS, "pic/"+cdate+File.separator+reName);
+////		return "pic/"+cdate+File.separator+reName;
+//	}
 	
 }

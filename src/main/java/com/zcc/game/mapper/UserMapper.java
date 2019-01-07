@@ -13,6 +13,7 @@ import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.ChangeCenterVO;
 import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.ParamVO;
+import com.zcc.game.vo.ReplyVO;
 import com.zcc.game.vo.UserVO;
 
 /**
@@ -37,4 +38,6 @@ public interface UserMapper {
 	public int addChangeCenter(ChangeCenterVO changeCenterVO);
 	public List<ChangeCenterVO> getCenterJf(ChangeCenterVO center);
 	
+	
+	public int addReply(ReplyVO reply);
 }

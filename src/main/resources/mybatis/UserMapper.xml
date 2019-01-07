@@ -184,4 +184,8 @@
 		order by id desc
  </select>
  
+ <insert id="addReply">
+ 	INSERT INTO gm_reply_t (userid,useraccount,TYPE,content,image1,image2,image3,image4,image5,create_date)
+ 	VALUES (#{userid},(SELECT account FROM gm_user_t WHERE id=#{userid}),#{TYPE},#{image1},#{image2},#{image3},#{image4},#{image5},now())
+ </insert>
 </mapper>

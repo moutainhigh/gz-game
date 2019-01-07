@@ -16,6 +16,7 @@ import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.ChangeCenterVO;
 import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.ParamVO;
+import com.zcc.game.vo.ReplyVO;
 import com.zcc.game.vo.UserVO;
 
 /**
@@ -29,6 +30,9 @@ public class UserService {
 	@Autowired
 	private UserMapper userMapper;
 	
+	public int addReply(ReplyVO reply){
+		return userMapper.addReply(reply);
+	}
 	public List<UserVO> getUsers(UserVO user){
 		return userMapper.getUsers(user);
 	}
