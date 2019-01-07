@@ -79,10 +79,10 @@ public class JfController extends BaseController{
 //            	return;
 //        	}
         }else if("4".equals(type) && jfrale<=center){//(中心->交易)
-        	if(!users.get(0).getJfzhuce().equals(new Double(users.get(0).getJfold()))){
-	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "注册积分必须和原注册积分相等");//注册积分必须和原注册积分相等
-				return;
-	        }
+//        	if(!users.get(0).getJfzhuce().equals(new Double(users.get(0).getJfold()))){
+//	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "注册积分必须和原注册积分相等");//注册积分必须和原注册积分相等
+//				return;
+//	        }
         	
         	user.setJfcenter(-jfrale);
         	user.setJfbusiness(jfrale);

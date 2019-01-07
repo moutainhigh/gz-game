@@ -123,6 +123,10 @@
  			buyercard=(SELECT bank_num FROM gm_user_t WHERE id=#{buyerid}),
  			buyeraccount=(SELECT account FROM gm_user_t WHERE id=#{buyerid}),
  		</if>
+ 		<if test="buyerid == null">
+ 			buyerid=null,buyeraccount=NULL,buyercard=NULL,
+ 		</if>
+ 		
  		<if test="buytime != null">
  			buytime=#{buytime},
  		</if>
@@ -137,6 +141,15 @@
  	<where>
  		<if test="id != null">
  			and id=#{id}
+ 		</if>
+ 		<if test="status == 2">
+ 			and status=4
+ 		</if>
+ 		<if test="status == 3">
+ 			and status=2
+ 		</if>
+ 		<if test="status == 4">
+ 			and status=1
  		</if>
  	</where>
  </update>

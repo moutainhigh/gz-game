@@ -12,12 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zcc.game.common.BusinessType;
 import com.zcc.game.common.HttpRequest;
 import com.zcc.game.common.OpenDataJob;
 import com.zcc.game.common.OrderJob;
 import com.zcc.game.common.QuartzJobUtils;
 import com.zcc.game.mapper.HomeMapper;
 import com.zcc.game.mapper.UserMapper;
+import com.zcc.game.utils.DateUtil;
 import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.ChangeCenterVO;
 import com.zcc.game.vo.DataVO;
@@ -95,16 +97,16 @@ public class HomeService {
 	public List<GiveTokenVO> getTokens(GiveTokenVO token){
 		return homeMapper.getTokens(token);
 	}
-	//回调，检查交易数据,未打款，封号，1，待售，2，交易中，3，已完成。4，过期
+	//回调，检查交易数据,未打款，封号，1，待售，2，交易中，3，已完成。4，购买中
 	@Transactional
-	public void checkBusiness(String id){
+	public void checkBusiness(String id) throws Exception{
 		BusinessVO business=new BusinessVO();
 		business.setId(Integer.parseInt(id));
 		List<BusinessVO> bs=homeMapper.getBusiness(business);
 		String status = bs.get(0).getStatus();
 		String userid = bs.get(0).getUserid();
-		if("2".equals(status)){//待交易，封号，记录交易日志。
-			business.setStatus("1");//返回待交易状态
+		if(BusinessType.交易中.getValue().equals(status)){//待交易，封号，记录交易日志。
+			business.setStatus(BusinessType.待购买.getValue());//返回待交易状态
 			homeMapper.updateBusiness(business);
 			UserVO user=new UserVO();
 			user.setId(Integer.parseInt(userid));
@@ -116,12 +118,31 @@ public class HomeService {
 			newBs.setSelljf(bs.get(0).getSelljf());
 			newBs.setBuyerid(bs.get(0).getBuyerid());
 			homeMapper.addBusinessLog(newBs);
+		}else if(BusinessType.购买中.getValue().equals(status)){//检查凭证是否上传成功
+			String voucher = bs.get(0).getVoucher();//上传凭证
+			if(voucher==null || "".equals(voucher)){//未上传成功，变为待购买
+				business.setStatus(BusinessType.待购买.getValue());//返回待交易状态
+				business.setBuyerid(null);
+			}else{//上传成功，变为交易中
+				business.setStatus(BusinessType.交易中.getValue());//返回待交易状态
+				business.setConfigtime(DateUtil.addDay(new Date(),1));//24小时后
+				business.setBuytime(new Date());
+				//添加定时任务，24小时之内付款，否则封号，解压状态继续售卖。
+				// 添加定时任务
+		     	JobDataMap jobDataMap = new JobDataMap();
+		        jobDataMap.put("businessid", business.getId()+"");
+		        jobDataMap.put("HomeService", this);
+		        
+		        //获取后台参数
+		        QuartzJobUtils.addJob("CANCEL_ORDER_"+business.getId(), OrderJob.class, getCronExpressionByFixTime(60*60*24), jobDataMap);
+			}
+			homeMapper.updateBusiness(business);
 		}
 	}
 	
 	@Transactional
 	public int updateBusiness(BusinessVO business) throws Exception{
-		if("4".equals(business.getStatus())){//过期未付款，从新生成挂卖信息，封号买家
+		if(BusinessType.购买中.getValue().equals(business.getStatus())){//购买中，5分钟内上传凭证。
 //			BusinessVO addbusiness = new BusinessVO();
 //			addbusiness.setUserid(business.getUserid());
 //			addbusiness.setSelljf(business.getSelljf());
@@ -130,7 +151,14 @@ public class HomeService {
 //	        user.setId(Integer.parseInt(business.getBuyerid()));
 //	        user.setStatus("1");//封号
 //	        userMapper.updateUser(user);
-		}else if("3".equals(business.getStatus())){//卖家确认收款，积分转换，交易完成
+			// 添加定时任务
+	     	JobDataMap jobDataMap = new JobDataMap();
+	        jobDataMap.put("businessid", business.getId()+"");
+	        jobDataMap.put("HomeService", this);
+	        
+	        //获取后台参数
+	        QuartzJobUtils.addJob("CANCEL_ORDER_"+business.getId(), OrderJob.class, getCronExpressionByFixTime(60*5), jobDataMap);
+		}else if(BusinessType.已完成.getValue().equals(business.getStatus())){//卖家确认收款，积分转换，交易完成
 			BusinessVO tempVO=new BusinessVO();
 			tempVO.setId(business.getId());
 			tempVO.setStatus("2");
@@ -148,7 +176,7 @@ public class HomeService {
 //			user2.setJfbusiness(-jf);
 //			user2.setPretake(-jf);
 //			userMapper.updateUser(user2);//卖出人减去积分
-		}else if("2".equals(business.getStatus())){//买家购买，状态变为交易中
+		}else if(BusinessType.交易中.getValue().equals(business.getStatus())){//买家购买，状态变为交易中
 			//添加定时任务，24小时之内付款，否则封号，解压状态继续售卖。
 			// 添加定时任务
 	     	JobDataMap jobDataMap = new JobDataMap();

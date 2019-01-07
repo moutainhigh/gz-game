@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zcc.game.common.BusinessType;
 import com.zcc.game.common.CommonUtil;
 import com.zcc.game.common.HttpRequest;
 import com.zcc.game.common.SysCode;
@@ -237,6 +238,12 @@ public class HomeController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
+		//新需求， add by zcc 2019-01-07
+		if(Integer.parseInt(selljf)>3000){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "单笔挂卖积分不能超过3000");
+        	return;
+		}
+		
         BusinessVO business = new BusinessVO();
         business.setUserid(userid);
         business.setSelljf(selljf);
@@ -290,12 +297,12 @@ public class HomeController extends BaseController{
 		
         BusinessVO business = new BusinessVO();
         business.setId(Integer.parseInt(id));
-        business.setStatus(status);//1,售卖中，2交易中，3交易成功
-        if("2".equals(status)){
+        business.setStatus(status);//1,售卖中，2购买中,3交易中，4交易成功
+        if(BusinessType.交易中.getValue().equals(status)){//交易中
         	business.setBuyerid(userid);
         	business.setConfigtime(DateUtil.addDay(new Date(),1));//24小时后
             business.setBuytime(new Date());
-		}else if("3".equals(status)){//卖方确认收到款，积分转换，状态变更，
+		}else if(BusinessType.已完成.getValue().equals(status)){//卖方确认收到款，积分转换，状态变更，
 			//验证用户信息
 	        UserVO user=new UserVO();
 	        user.setId(Integer.parseInt(userid));
@@ -310,8 +317,8 @@ public class HomeController extends BaseController{
 	        	return;
 	    	}
 			business.setFinishtime(new Date());
-		}else if("4".equals(status)){//过期未付款
-			
+		}else if(BusinessType.购买中.getValue().equals(status)){//购买中
+			business.setBuyerid(userid);
 		}
         
         try {
@@ -415,7 +422,15 @@ public class HomeController extends BaseController{
         	return;
 		}
 		int taskNum =users.get(0).getTaskToken();
-		if(taskNum<=0){
+		// add by zcc 2019-01-07
+		String oldjf =users.get(0).getJfold();
+		Integer num=Integer.parseInt(oldjf)/5000;
+        Integer num2=Integer.parseInt(oldjf)%5000;
+        System.out.println(num+","+num2);
+        if(num2!=0){
+        	num++;
+        }
+		if(taskNum-num<0){
 			renderJson(request, response, SysCode.PARAM_IS_ERROR, "秘钥不足");
         	return;
 		}
@@ -428,6 +443,10 @@ public class HomeController extends BaseController{
 		double taskjf=users.get(0).getJftask()==null?0:users.get(0).getJftask();
 		if(taskjf>0){
 			renderJson(request, response, SysCode.PARAM_IS_ERROR, "尚有任务积分未消费");
+        	return;
+		}
+		if(users.get(0).getJfzhuce()<Double.valueOf(users.get(0).getJfold())){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "注册积分必须不能小于原始注册积分");
         	return;
 		}
 		//是否自动审批通过
