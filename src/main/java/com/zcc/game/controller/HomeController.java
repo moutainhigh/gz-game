@@ -54,6 +54,7 @@ public class HomeController extends BaseController{
 	
 //	@Autowired
 //	private RabbitMQSender rabbitMQSender;
+	
 	//获取公告
 	@RequestMapping("/test")
 	public void test(HttpServletRequest request,HttpServletResponse response){
