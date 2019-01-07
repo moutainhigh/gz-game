@@ -21,6 +21,7 @@ public class ReplyVO {
 //	  `remark` VARCHAR(100) DEFAULT NULL COMMENT '备注',
 //	  `create_date` TIMESTAMP NULL DEFAULT NULL COMMENT '创建时间',
 	  private Integer id;
+	  private String msgid;
 	  private String userid;
 	  private String content;
 	  private String type;
@@ -35,6 +36,14 @@ public class ReplyVO {
 	  private String image9;
 	  private String remark;
 	  private Date create_date;
+	  
+	  
+	public String getMsgid() {
+		return msgid;
+	}
+	public void setMsgid(String msgid) {
+		this.msgid = msgid;
+	}
 	public Integer getId() {
 		return id;
 	}

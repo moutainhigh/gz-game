@@ -545,8 +545,9 @@ public class UserController extends BaseController{
 	@RequestMapping("/addReply")
 	public void addReply(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"image1","userid","content","image2","image3","image4","image5"};
+		String[] paramKey = {"msgId","image1","userid","content","image2","image3","image4","image5"};
 		Map<String, String> params = parseParams(request, "addReply", paramKey);
+		String msgId = params.get("msgId"); 
 		String content = params.get("content"); 
 		String userid = params.get("userid"); 
 		String image1 = params.get("image1"); 
@@ -555,7 +556,7 @@ public class UserController extends BaseController{
 		String image4 = params.get("image4"); 
 		String image5 = params.get("image5"); 
 		
-		if(StringUtils.isBlank(content) || StringUtils.isBlank(userid) ){//userID不能为空
+		if(StringUtils.isBlank(content) || StringUtils.isBlank(userid) ||StringUtils.isBlank(msgId)){//userID不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
@@ -568,9 +569,10 @@ public class UserController extends BaseController{
 		}
 		//新需求， add by zcc 2019-01-07
 		ReplyVO reply=new ReplyVO();
+		reply.setMsgid(msgId);
 		reply.setUserid(userid);
 		reply.setContent(content);
-		reply.setType("客户回复");
+		reply.setType("客户反馈");
 		reply.setImage1(image1);
 		reply.setImage2(image2);
 		reply.setImage3(image3);
