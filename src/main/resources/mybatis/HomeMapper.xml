@@ -3,13 +3,26 @@
 
 <mapper namespace="com.zcc.game.mapper.HomeMapper">
  
+ <insert id="addNotices" >
+ 	INSERT INTO gm_notice_t(title,content,attribute1,attribute2,create_date)
+ 	VALUES(#{title},#{content},#{attribute1},#{attribute2},now()) 
+ </insert>
   <!-- 获取公告 -->
  <select id="getNotices" resultType="com.zcc.game.vo.NoticeVO">
  	SELECT id,title,content,attribute1,attribute2,create_date 
  	FROM gm_notice_t 
+ 	WHERE attribute1=0 
  	order by create_date desc
  	LIMIT 5
  </select>
+ <!-- 获取公告 -->
+ <select id="getNoticesByUser" resultType="com.zcc.game.vo.NoticeVO">
+ 	SELECT id,title,content,attribute1,attribute2,create_date as createDate
+ 	FROM gm_notice_t 
+ 	WHERE attribute1=1 and  attribute2=#{attribute2}
+ 	order by create_date desc
+ </select>
+ 
  <!-- 下注赢的记录 -->
  <select id="getWinData" resultType="com.zcc.game.vo.PoolVO">
  	SELECT *
@@ -96,7 +109,6 @@
 	(SELECT weixinpic FROM gm_user_t WHERE id=#{userid}),
 	(SELECT alipaypic FROM gm_user_t WHERE id=#{userid}),
 	#{selljf},1,now());
-	update gm_user_t set jfbusiness=jfbusiness-#{selljf} where id=#{userid}
  </insert> 
   <!-- 添加挂卖历史  违约用户记录 -->
  <insert id="addBusinessLog" useGeneratedKeys="true" keyProperty="id">
@@ -160,7 +172,7 @@
  	(SELECT username FROM gm_user_t WHERE id=#{userid}),
  	(SELECT telephone FROM gm_user_t WHERE id=#{userid}),
  	now());
- 	update gm_user_t set task_token=task_token-1,usedtoken=usedtoken+1 where id=#{userid}
+ 	update gm_user_t set task_token=task_token-#{tokenNum},usedtoken=usedtoken+#{tokenNum} where id=#{userid}
  </insert> 
  <!-- 更新任务信息 -->
  <update id="updateTask">
@@ -280,6 +292,23 @@
  <select id="getMessages" resultType="com.zcc.game.vo.MessageVO">
  	select * from gm_message_t
  	where userid=#{userid}
+ 	order by id desc
+ </select>
+ 
+  <!-- 查看留言列表 -->
+ <select id="getReply" resultType="com.zcc.game.vo.ReplyVO">
+ 	select * from gm_reply_t
+ 	<where>
+ 		<if test="msgid != null">
+ 			and msgid=#{msgid}
+ 		</if>
+ 		<if test="msgid == null">
+ 			and msgid is null
+ 		</if>
+ 		<if test="userid != null">
+ 			and userid=#{userid}
+ 		</if>
+ 	</where>
  	order by id desc
  </select>
  <!-- 赠送秘钥 -->

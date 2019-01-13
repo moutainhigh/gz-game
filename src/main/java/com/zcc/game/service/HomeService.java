@@ -28,6 +28,7 @@ import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PailongVO;
 import com.zcc.game.vo.PoolVO;
+import com.zcc.game.vo.ReplyVO;
 import com.zcc.game.vo.TaskVO;
 import com.zcc.game.vo.TokenVO;
 import com.zcc.game.vo.UserVO;
@@ -40,6 +41,8 @@ public class HomeService {
 	private HomeMapper homeMapper;
 	@Autowired
 	private UserMapper userMapper;
+	@Autowired
+	private UserService userService;
 	
 	//获取今天赢的记录数
 	public List<PoolVO> getWinData(PoolVO notice){
@@ -60,8 +63,14 @@ public class HomeService {
         return sdf.format(date);
     }
     
+	public int addNotices(NoticeVO notice){
+		return homeMapper.addNotices(notice);
+	}
 	public List<NoticeVO> getNotices(NoticeVO notice){
 		return homeMapper.getNotices(notice);
+	}
+	public List<NoticeVO> getNoticesByUser(NoticeVO notice){
+		return homeMapper.getNoticesByUser(notice);
 	}
 	public List<PailongVO> getPailong(PailongVO pailong){
 		return homeMapper.getPailong(pailong);
@@ -76,8 +85,14 @@ public class HomeService {
 	public List<BusinessVO> getBuyJf(BusinessVO business){
 		return homeMapper.getBuyJf(business);
 	}
+	@Transactional
 	public int addBusiness(BusinessVO business) throws Exception{
 		int num = homeMapper.addBusiness(business);
+//		update gm_user_t set jfbusiness=jfbusiness-#{selljf} where id=#{userid}
+		UserVO user=new UserVO();
+		user.setId(Integer.parseInt(business.getUserid()));
+		user.setJfbusiness(-new Double(business.getSelljf()));
+		userService.updateUser(user);
 		return num;
 	}
 	
@@ -90,6 +105,9 @@ public class HomeService {
 	}
 	public List<MessageVO> getMessages(MessageVO message){
 		return homeMapper.getMessages(message);
+	}
+	public List<ReplyVO> getReply(ReplyVO message){
+		return homeMapper.getReply(message);
 	}
 	public int addToken(TokenVO token){
 		return homeMapper.addToken(token);
@@ -106,8 +124,8 @@ public class HomeService {
 		String status = bs.get(0).getStatus();
 		String userid = bs.get(0).getUserid();
 		if(BusinessType.交易中.getValue().equals(status)){//待交易，封号，记录交易日志。
-			business.setStatus(BusinessType.待购买.getValue());//返回待交易状态
-			homeMapper.updateBusiness(business);
+//			business.setStatus(BusinessType.待购买.getValue());//返回待交易状态
+//			homeMapper.updateBusiness(business);
 			UserVO user=new UserVO();
 			user.setId(Integer.parseInt(userid));
 			user.setStatus("1");//无效账号
@@ -127,6 +145,7 @@ public class HomeService {
 				business.setStatus(BusinessType.交易中.getValue());//返回待交易状态
 				business.setConfigtime(DateUtil.addDay(new Date(),1));//24小时后
 				business.setBuytime(new Date());
+				business.setBuyerid(bs.get(0).getBuyerid());
 				//添加定时任务，24小时之内付款，否则封号，解压状态继续售卖。
 				// 添加定时任务
 		     	JobDataMap jobDataMap = new JobDataMap();
@@ -223,7 +242,7 @@ public class HomeService {
 		return num;
 	}
 	public List<DataVO> getData(DataVO data){
-		taskData();
+//		taskData();
 		return homeMapper.getData(data);
 	}
 	

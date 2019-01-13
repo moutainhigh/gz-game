@@ -42,8 +42,13 @@ public class UserService {
 	public int insertUser(UserVO user){
 		return userMapper.insertUser(user);
 	}
+	//更新上锁
 	public int updateUser(UserVO user){
-		return userMapper.updateUser(user);
+		int result=0;
+		synchronized (user.getId()) {
+			result=userMapper.updateUser(user);
+		}
+		return result;
 	}
 	public int updateBusiness(BusinessVO user){
 		return userMapper.updateBusiness(user);
@@ -55,7 +60,9 @@ public class UserService {
 		if(chnageCenter.getNum()!=null || !"".equals(chnageCenter.getNum())){
 			userMapper.addChangeCenter(chnageCenter);
 		}
-		return userMapper.updateUser(user);
+		int result = updateUser(user);
+//		userMapper.updateUser(user)
+		return result;
 	}
 	
 	@Transactional

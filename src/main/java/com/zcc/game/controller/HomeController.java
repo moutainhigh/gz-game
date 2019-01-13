@@ -30,6 +30,7 @@ import com.zcc.game.service.HomeService;
 import com.zcc.game.service.UserService;
 import com.zcc.game.utils.DateUtil;
 import com.zcc.game.utils.MD5Util;
+import com.zcc.game.utils.mq.JmsUtil;
 import com.zcc.game.vo.BusinessVO;
 import com.zcc.game.vo.DataVO;
 import com.zcc.game.vo.GiveTokenVO;
@@ -38,6 +39,7 @@ import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PailongVO;
 import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.PoolVO;
+import com.zcc.game.vo.ReplyVO;
 import com.zcc.game.vo.TaskVO;
 import com.zcc.game.vo.TokenVO;
 import com.zcc.game.vo.UserVO;
@@ -51,6 +53,8 @@ public class HomeController extends BaseController{
 	private HomeService homeService;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private JmsUtil jmsUtil;
 	
 //	@Autowired
 //	private RabbitMQSender rabbitMQSender;
@@ -113,7 +117,29 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
+	//获取通知消息--根据用户
+	@RequestMapping("/getNoticesByUser")
+	public void getNoticesByUser(HttpServletRequest request,HttpServletResponse response){
 		
+		String[] paramKey = {"userId"};
+		Map<String, String> params = parseParams(request, "getNoticesByUser", paramKey);
+        String userId = params.get("userId"); 
+        NoticeVO notice=new NoticeVO();
+        notice.setAttribute2(userId);
+        try {
+	        //获取通知消息
+	    	List<NoticeVO> result = homeService.getNoticesByUser(notice);
+	    	if(result !=null && result.size()>0){
+	    		renderJson(request, response, SysCode.SUCCESS, result);
+			}else{
+				renderJson(request, response, SysCode.SUCCESS, result);
+			}
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getNotice()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}	
 	//获取公告
 	@RequestMapping("/getNotice")
 	public void getNotice(HttpServletRequest request,HttpServletResponse response){
@@ -225,6 +251,60 @@ public class HomeController extends BaseController{
 			}
 		}
 		
+//	//增添挂卖信息
+//	@RequestMapping("/addBusiness")
+//	public void addBusiness(HttpServletRequest request,HttpServletResponse response){
+//		
+//		String[] paramKey = {"selljf","userid","safepwd"};
+//		Map<String, String> params = parseParams(request, "addBusiness", paramKey);
+//		String selljf = params.get("selljf"); 
+//		String userid = params.get("userid"); 
+//		String safepwd = params.get("safepwd"); 
+//		
+//		if(StringUtils.isBlank(selljf) || StringUtils.isBlank(userid) || StringUtils.isBlank(safepwd)){//userID不能为空
+//        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+//        	return;
+//        }
+//		//新需求， add by zcc 2019-01-07
+//		if(Integer.parseInt(selljf)>3000){
+//			renderJson(request, response, SysCode.PARAM_IS_ERROR, "单笔挂卖积分不能超过3000");
+//        	return;
+//		}
+//		
+//        BusinessVO business = new BusinessVO();
+//        business.setUserid(userid);
+//        business.setSelljf(selljf);
+//        //验证用户信息
+//        UserVO user=new UserVO();
+//        user.setId(Integer.parseInt(userid));
+//        user.setStatus("0");
+//        List<UserVO> users = userService.getUsers(user);
+//        if(users ==null || users.size()<=0){
+//        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+//        	return;
+//        }
+//        double businessjf=new Double(users.get(0).getJfbusiness());
+////        double pretake=users.get(0).getPretake();//预扣减
+//    	String pwd=users.get(0).getSafepwd();
+//    	if(businessjf<Integer.parseInt(selljf) || !MD5Util.MD5(safepwd).equals(pwd)){
+//    		renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足或密码错误");
+//        	return;
+//    	}
+//    	
+//        try {
+//	        //添加挂卖
+//	    	int result = homeService.addBusiness(business);
+//	    	if(result ==1){
+//	    		renderJson(request, response, SysCode.SUCCESS, result);
+//			}else{
+//				renderJson(request, response, SysCode.SUCCESS, result);
+//			}
+//        } catch (Exception e) {
+//        	e.printStackTrace();
+//        	logger.info("`````method``````addBusiness()`````"+e.getMessage());
+//			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+//		}
+//	}
 	//增添挂卖信息
 	@RequestMapping("/addBusiness")
 	public void addBusiness(HttpServletRequest request,HttpServletResponse response){
@@ -258,28 +338,27 @@ public class HomeController extends BaseController{
         	return;
         }
         double businessjf=new Double(users.get(0).getJfbusiness());
-//        double pretake=users.get(0).getPretake();//预扣减
+//	        double pretake=users.get(0).getPretake();//预扣减
     	String pwd=users.get(0).getSafepwd();
-    	if(businessjf<Integer.parseInt(selljf) || !MD5Util.MD5(safepwd).equals(pwd)){
+    	if(businessjf<Integer.parseInt(selljf) || !MD5Util.MD5(safepwd).equals(pwd) ||Integer.parseInt(selljf)<=0){
     		renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足或密码错误");
         	return;
     	}
-    	
+    	jmsUtil.sendMsg("add_business_queue", userid+","+selljf+","+safepwd);
         try {
 	        //添加挂卖
-	    	int result = homeService.addBusiness(business);
-	    	if(result ==1){
-	    		renderJson(request, response, SysCode.SUCCESS, result);
-			}else{
-				renderJson(request, response, SysCode.SUCCESS, result);
-			}
+//	    	int result = homeService.addBusiness(business);
+//	    	if(result ==1){
+	    		renderJson(request, response, SysCode.SUCCESS, 1);
+//			}else{
+//				renderJson(request, response, SysCode.SUCCESS, result);
+//			}
         } catch (Exception e) {
         	e.printStackTrace();
         	logger.info("`````method``````addBusiness()`````"+e.getMessage());
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
-	
 	//购买/确认收款/
 	@RequestMapping("/updateBusiness")
 	public void updateBusiness(HttpServletRequest request,HttpServletResponse response){
@@ -425,8 +504,8 @@ public class HomeController extends BaseController{
 		int taskNum =users.get(0).getTaskToken();
 		// add by zcc 2019-01-07
 		String oldjf =users.get(0).getJfold();
-		Integer num=Integer.parseInt(oldjf)/5000;
-        Integer num2=Integer.parseInt(oldjf)%5000;
+		Integer num=new Double(oldjf).intValue()/5000;
+		Integer num2=new Double(oldjf).intValue()%5000;
         System.out.println(num+","+num2);
         if(num2!=0){
         	num++;
@@ -467,7 +546,7 @@ public class HomeController extends BaseController{
         task.setUserid(userid);
         task.setStatus(status);
         task.setTitle(title);
-        
+        task.setTokenNum(num);
         //验证今日未赢过，
         
         try {
@@ -739,6 +818,48 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
+	//查看回复
+	@RequestMapping("/getReply")
+	public void getReply(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userId"};
+		Map<String, String> params = parseParams(request, "getReply", paramKey);
+		String userId = params.get("userId"); 
+		
+		if(StringUtils.isBlank(userId) ){
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+		UserVO user=new UserVO();
+		user.setId(Integer.valueOf(userId));
+		List<UserVO> userList = userService.getUsers(user);
+		if(userList==null || userList.size()<=0){
+			renderJson(request, response, SysCode.PARAM_IS_ERROR, "用户ID无效");
+        	return;
+		}
+		
+		ReplyVO reply=new ReplyVO();
+		reply.setMsgid("0");
+		reply.setUserid(userId);
+		List<ReplyVO> list = new ArrayList<ReplyVO>();
+		List<ReplyVO> result = homeService.getReply(reply);
+		for (ReplyVO rep:result) {
+			reply.setMsgid(rep.getId()+"");
+			List<ReplyVO> repList = homeService.getReply(reply);
+			list.add(rep);
+			list.addAll(repList);
+		}
+        try {
+	        //添加留言
+//	    	List<ReplyVO> result = homeService.getReply(reply);
+	    	renderJson(request, response, SysCode.SUCCESS, list);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getReply()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+	
 	//添加赠送秘钥记录
 	@RequestMapping("/addToken")
 	public void addToken(HttpServletRequest request,HttpServletResponse response){

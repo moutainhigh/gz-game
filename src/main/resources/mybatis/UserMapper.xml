@@ -188,7 +188,5 @@
  	INSERT INTO gm_reply_t (msgid,userid,useraccount,type,content,image1,image2,image3,image4,image5,create_date)
  	VALUES (#{msgid},#{userid},(SELECT account FROM gm_user_t WHERE id=#{userid}),#{type},
  	#{content},#{image1},#{image2},#{image3},#{image4},#{image5},now());
- 	UPDATE gm_message_t SET content=#{content},reply=NULL,create_date=NOW()
-	WHERE id=#{msgid}
  </insert>
 </mapper>

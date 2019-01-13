@@ -13,6 +13,16 @@ public class TaskVO {
 	private String attribute2;
 	private Date create_date;
 	private Date lastup_date;
+	
+	private Integer tokenNum;
+	
+	
+	public Integer getTokenNum() {
+		return tokenNum;
+	}
+	public void setTokenNum(Integer tokenNum) {
+		this.tokenNum = tokenNum;
+	}
 	public Integer getId() {
 		return id;
 	}

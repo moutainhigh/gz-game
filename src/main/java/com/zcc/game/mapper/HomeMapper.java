@@ -16,6 +16,7 @@ import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PailongVO;
 import com.zcc.game.vo.PoolVO;
+import com.zcc.game.vo.ReplyVO;
 import com.zcc.game.vo.TaskVO;
 import com.zcc.game.vo.TokenVO;
 
@@ -26,7 +27,9 @@ import com.zcc.game.vo.TokenVO;
 @Component
 public interface HomeMapper {
 	
+	public int addNotices(NoticeVO user);
 	public List<NoticeVO> getNotices(NoticeVO user);
+	public List<NoticeVO> getNoticesByUser(NoticeVO user);
 	public List<PoolVO> getWinData(PoolVO poolVO);
 	public List<BusinessVO> getBusiness(BusinessVO business);
 	public List<BusinessVO> getBusinessBySell(BusinessVO business);
@@ -54,6 +57,7 @@ public interface HomeMapper {
 	//添加留言
 	public int addMessage(MessageVO message);
 	public List<MessageVO> getMessages(MessageVO message);
+	public List<ReplyVO> getReply(ReplyVO message);
 	
 	//赠送秘钥
 	public int addToken(TokenVO token);

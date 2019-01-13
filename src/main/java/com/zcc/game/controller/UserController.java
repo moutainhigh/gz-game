@@ -546,23 +546,23 @@ public class UserController extends BaseController{
 	@RequestMapping("/addReply")
 	public void addReply(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"msgId","image1","userid","content","image2","image3","image4","image5"};
+		String[] paramKey = {"msgId","image1","userId","content","image2","image3","image4","image5"};
 		Map<String, String> params = parseParams(request, "addReply", paramKey);
 		String msgId = params.get("msgId"); 
 		String content = params.get("content"); 
-		String userid = params.get("userid"); 
+		String userId = params.get("userId"); 
 		String image1 = params.get("image1"); 
 		String image2 = params.get("image2"); 
 		String image3 = params.get("image3"); 
 		String image4 = params.get("image4"); 
 		String image5 = params.get("image5"); 
 		
-		if(StringUtils.isBlank(content) ||StringUtils.isBlank(msgId)){//userID不能为空
+		if(StringUtils.isBlank(content) ||StringUtils.isBlank(userId)){//userID不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
 		UserVO user=new UserVO();
-		user.setId(Integer.valueOf(userid));
+		user.setId(Integer.valueOf(userId));
 		List<UserVO> userList = userService.getUsers(user);
 		if(userList==null || userList.size()<=0){
 			renderJson(request, response, SysCode.PARAM_IS_ERROR, "用户ID无效");
@@ -570,8 +570,12 @@ public class UserController extends BaseController{
 		}
 		//新需求， add by zcc 2019-01-07
 		ReplyVO reply=new ReplyVO();
-		reply.setMsgid(msgId);
-		reply.setUserid(userid);
+		if(null==msgId){
+			reply.setMsgid("0");
+		}else{
+			reply.setMsgid(msgId);
+		}
+		reply.setUserid(userId);
 		reply.setContent(content);
 		reply.setType("客户反馈");
 		reply.setImage1(image1);
@@ -579,7 +583,6 @@ public class UserController extends BaseController{
 		reply.setImage3(image3);
 		reply.setImage4(image4);
 		reply.setImage5(image5);
-		
        
         try {
 	        //添加回复
@@ -595,6 +598,8 @@ public class UserController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
+		
+	
 		
 	/**
 	 * 上传文件
