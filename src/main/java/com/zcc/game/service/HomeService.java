@@ -27,6 +27,7 @@ import com.zcc.game.vo.GiveTokenVO;
 import com.zcc.game.vo.MessageVO;
 import com.zcc.game.vo.NoticeVO;
 import com.zcc.game.vo.PailongVO;
+import com.zcc.game.vo.ParamVO;
 import com.zcc.game.vo.PoolVO;
 import com.zcc.game.vo.ReplyVO;
 import com.zcc.game.vo.TaskVO;
@@ -170,13 +171,22 @@ public class HomeService {
 //	        user.setId(Integer.parseInt(business.getBuyerid()));
 //	        user.setStatus("1");//封号
 //	        userMapper.updateUser(user);
+			ParamVO param=new ParamVO();
+	        param.setNumber("008");//获取时间限制
+	        param=userService.getParam(param);
+	        int num=5;
+	        if(param.getData()!=null && !"".equals(param.getData())){
+	        	business.setCount(Integer.parseInt(param.getData()));
+	        	num=Integer.parseInt(param.getData());
+	        }
+	        
 			// 添加定时任务
 	     	JobDataMap jobDataMap = new JobDataMap();
 	        jobDataMap.put("businessid", business.getId()+"");
 	        jobDataMap.put("HomeService", this);
 	        
 	        //获取后台参数
-	        QuartzJobUtils.addJob("CANCEL_ORDER_"+business.getId(), OrderJob.class, getCronExpressionByFixTime(60*5), jobDataMap);
+	        QuartzJobUtils.addJob("CANCEL_ORDER_"+business.getId(), OrderJob.class, getCronExpressionByFixTime(60*num), jobDataMap);
 		}else if(BusinessType.已完成.getValue().equals(business.getStatus())){//卖家确认收款，积分转换，交易完成
 			BusinessVO tempVO=new BusinessVO();
 			tempVO.setId(business.getId());
