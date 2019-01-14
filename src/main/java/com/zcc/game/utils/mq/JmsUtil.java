@@ -7,7 +7,6 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
-import com.zcc.game.common.SysCode;
 import com.zcc.game.service.HomeService;
 import com.zcc.game.service.UserService;
 import com.zcc.game.utils.MD5Util;
@@ -34,7 +33,7 @@ public class JmsUtil {
 	 * 挂卖积分
 	 * @param message
 	 */
-//	@JmsListener(destination="add_business_queue")
+	@JmsListener(destination="add_business_queue")
 	public void receiveUploadQueue(String message){
 		System.out.println("add_business_queue --收到消息："+message);
 		BusinessVO business = new BusinessVO();
