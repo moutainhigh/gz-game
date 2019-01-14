@@ -334,14 +334,21 @@ public class HomeController extends BaseController{
         user.setStatus("0");
         List<UserVO> users = userService.getUsers(user);
         if(users ==null || users.size()<=0){
-        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, "用户无效");
         	return;
         }
         double businessjf=new Double(users.get(0).getJfbusiness());
+        Double jfOld=new Double(users.get(0).getJfold());//原始注册积分；
+        Double jfZhuce=users.get(0).getJfzhuce();//原始注册积分；
+        
 //	        double pretake=users.get(0).getPretake();//预扣减
     	String pwd=users.get(0).getSafepwd();
     	if(businessjf<Integer.parseInt(selljf) || !MD5Util.MD5(safepwd).equals(pwd) ||Integer.parseInt(selljf)<=0){
     		renderJson(request, response, SysCode.PARAM_IS_ERROR, "积分不足或密码错误");
+        	return;
+    	}
+    	if(jfOld==null || jfZhuce==null || jfOld.intValue()>jfZhuce.intValue()){
+    		renderJson(request, response, SysCode.PARAM_IS_ERROR, "注册积分必须不小于原始注册积分");
         	return;
     	}
     	jmsUtil.sendMsg("add_business_queue", userid+","+selljf+","+safepwd);
@@ -503,13 +510,14 @@ public class HomeController extends BaseController{
 		}
 		int taskNum =users.get(0).getTaskToken();
 		// add by zcc 2019-01-07
-		String oldjf =users.get(0).getJfold();
-		Integer num=new Double(oldjf).intValue()/5000;
-		Integer num2=new Double(oldjf).intValue()%5000;
-        System.out.println(num+","+num2);
-        if(num2!=0){
-        	num++;
-        }
+//		String oldjf =users.get(0).getJfold();
+//		Integer num=new Double(oldjf).intValue()/5000;
+//		Integer num2=new Double(oldjf).intValue()%5000;
+//        System.out.println(num+","+num2);
+//        if(num2!=0){
+//        	num++;
+//        }
+		int num=1;
 		if(taskNum-num<0){
 			renderJson(request, response, SysCode.PARAM_IS_ERROR, "秘钥不足");
         	return;

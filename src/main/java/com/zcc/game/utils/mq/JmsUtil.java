@@ -72,7 +72,7 @@ public class JmsUtil {
 				notice.setTitle("挂卖失败");
 	            notice.setContent("添加挂卖失败,系统异常请稍后重试！");
 			}
-//			homeService.addNotices(notice);
+			homeService.addNotices(notice);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("receiveQueue error queue=test message:"+e.getMessage());
@@ -103,8 +103,12 @@ public class JmsUtil {
         //比较数据version是否最新
         double zhuce = new Double(users.get(0).getJfzhuce()) -users.get(0).getJfDiya();
         double center = new Double(users.get(0).getJfcenter());
+        Double business = users.get(0).getJfbusiness();
+        Double jftask = users.get(0).getJftask();
         Double jfrale=new Double(jf);
-    
+        NoticeVO notice=new NoticeVO();
+        notice.setAttribute1("2");//积分转换
+        notice.setAttribute2(userId);
         //记录中心积分转换日志
         ChangeCenterVO chnageCenter=new ChangeCenterVO();
         if("1".equals(type) && jfrale<=zhuce){//(注册->中心)
@@ -115,9 +119,14 @@ public class JmsUtil {
         	chnageCenter.setStatus("积分转换");
         	chnageCenter.setType("转入");
         	
+        	notice.setTitle("注册积分->中心积分");
+            notice.setContent(users.get(0).getAccount()+" 用户注册积分转中心积分，当前注册积分为："+zhuce+" , 中心积分为："+center);
         }else if("2".equals(type) && jfrale<=center){//(注册->交易)--需求变更为：--(中心->注册)
         	user.setJfcenter(-jfrale);
         	user.setJfzhuce(jfrale);
+        	
+        	notice.setTitle("中心积分->注册积分");
+            notice.setContent(users.get(0).getAccount()+" 用户中心积分转注册积分，当前注册积分为："+zhuce+" , 中心积分为："+center);
         }else if("4".equals(type) && jfrale<=center){//(中心->交易)
         	user.setJfcenter(-jfrale);
         	user.setJfbusiness(jfrale);
@@ -125,6 +134,9 @@ public class JmsUtil {
         	chnageCenter.setNum(jfrale+"");
         	chnageCenter.setStatus("积分转换");
         	chnageCenter.setType("转出");
+        	
+        	notice.setTitle("中心积分->交易积分");
+            notice.setContent(users.get(0).getAccount()+" 用户中心积分转交易积分，当前交易积分为："+business+" , 中心积分为："+center);
         }else if("5".equals(type) && jfrale<=center){//(中心->任务)
         	//要有预申请的任务积分
         	if(users.get(0).getPrejftask()>0 && users.get(0).getPrejftask().equals(new Double(jf))){
@@ -132,14 +144,24 @@ public class JmsUtil {
             	user.setJftask(jfrale);
             	user.setPrejftask(new Double(0));
         	}else{
-            	return;
+        		notice.setTitle("积分转换失败");
+                notice.setContent(users.get(0).getAccount()+" 用户中心积分转任务积分失败，预申请任务积分："+users.get(0).getPrejftask()+",转换积分："+jf);
+                homeService.addNotices(notice);
+                return;
         	}
         	chnageCenter.setUserid(userId);
         	chnageCenter.setNum(jfrale+"");
         	chnageCenter.setStatus("积分转换");
         	chnageCenter.setType("转出");
+        	
+        	notice.setTitle("中心积分->任务积分");
+            notice.setContent(users.get(0).getAccount()+" 用户中心积分转任务积分，当前交易积分为："+jftask+" , 中心积分为："+center);
+        }else{
+        	notice.setTitle("积分转换失败");
+            notice.setContent(users.get(0).getAccount()+" 用户积分转换错误,转换类型错误");
         }
         userService.updateUser(user,chnageCenter);
+        homeService.addNotices(notice);//添加日志
 	}
 	
 	/**
