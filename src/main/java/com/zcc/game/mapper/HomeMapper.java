@@ -39,6 +39,7 @@ public interface HomeMapper {
 	public int addBusiness(BusinessVO business);
 	public int addBusinessLog(BusinessVO business);
 	public int updateBusiness(BusinessVO business);
+	public int updateBusinessByConfirm(BusinessVO business);
 	
 	public int addTask(TaskVO task);
 	public List<TaskVO> getTaskByStatus(TaskVO task);

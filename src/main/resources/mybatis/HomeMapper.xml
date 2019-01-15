@@ -165,6 +165,28 @@
  		</if>
  	</where>
  </update>
+ 
+ <update id="updateBusinessByConfirm">
+ 	update gm_business_t 
+ 	<set>
+ 		<if test="status != null">
+ 			status=#{status},
+ 		</if>
+ 		<if test="finishtime != null">
+ 			finishtime=#{finishtime},
+ 		</if>
+ 		lastup_date=now()
+ 	</set>
+ 	<where>
+ 		<if test="id != null">
+ 			and id=#{id}
+ 		</if>
+ 		<if test="status == 3">
+ 			and status=2
+ 		</if>
+ 	</where>
+ </update>
+ 
  <!-- 添加任务 -->
  <insert id="addTask">
  	INSERT INTO gm_task_t(title,STATUS,taskjf,userid,username,attribute2,create_date) 

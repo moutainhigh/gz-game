@@ -59,7 +59,12 @@ public class HomeController extends BaseController{
 //		for (int i = 0; i < list.size(); i++) {
 //			System.out.println(list.get(i).getExpect());
 //		}
-		homeService.getPaiLongData();
+		try {
+			homeService.checkBusiness("692");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+//		homeService.getPaiLongData();
 	}
 	//获取两面排龙
 	@RequestMapping("/getPaiLong")
@@ -454,6 +459,9 @@ public class HomeController extends BaseController{
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
+		synchronized (userid) {
+			
+		
 		//检查是否有在途的单据（未审批）
 		TaskVO taskVO=new TaskVO();
 		taskVO.setUserid(userid);
@@ -523,10 +531,10 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.PARAM_IS_ERROR, "尚有任务积分未消费");
         	return;
 		}
-		if(users.get(0).getJfzhuce()<Double.valueOf(users.get(0).getJfold())){
-			renderJson(request, response, SysCode.PARAM_IS_ERROR, "注册积分必须不能小于原始注册积分");
-        	return;
-		}
+//		if(users.get(0).getJfzhuce()<Double.valueOf(users.get(0).getJfold())){
+//			renderJson(request, response, SysCode.PARAM_IS_ERROR, "注册积分必须不能小于原始注册积分");
+//        	return;
+//		}
 		//是否自动审批通过
 		TaskVO task = new TaskVO();
 		ParamVO param =new ParamVO();
@@ -559,6 +567,7 @@ public class HomeController extends BaseController{
         	e.printStackTrace();
         	logger.info("`````method``````addTask()`````"+e.getMessage());
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
 		}
 	}		
 	//获取开奖

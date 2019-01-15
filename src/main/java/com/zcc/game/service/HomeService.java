@@ -159,6 +159,9 @@ public class HomeService {
 			homeMapper.updateBusiness(business);
 		}
 	}
+	public int updateBusinessByConfirm(BusinessVO business){
+		return homeMapper.updateBusinessByConfirm(business);
+	}
 	
 	@Transactional
 	public int updateBusiness(BusinessVO business) throws Exception{
@@ -195,11 +198,12 @@ public class HomeService {
 			String sellJf=list.get(0).getSelljf();
 			Double jf=new Double(sellJf);
 			String buyerId=list.get(0).getBuyerid();
-			String sellerId=list.get(0).getUserid();
+//			String sellerId=list.get(0).getUserid();
 			UserVO user=new UserVO();
 			user.setId(Integer.parseInt(buyerId));
 			user.setJfcenter(jf);
 			userMapper.updateUser(user);//购买人增加积分
+			return homeMapper.updateBusinessByConfirm(business);
 //			UserVO user2=new UserVO();
 //			user2.setId(Integer.parseInt(sellerId));
 //			user2.setJfbusiness(-jf);
@@ -229,6 +233,7 @@ public class HomeService {
 		}
 		return homeMapper.addTask(task);
 	}
+	
 	public int updateTask(TaskVO task){
 		return homeMapper.updateTask(task);
 	}
