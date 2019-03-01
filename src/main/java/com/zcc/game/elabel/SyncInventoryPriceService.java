@@ -66,6 +66,7 @@ public class SyncInventoryPriceService extends BaseService {
 	@Autowired
 	IdService idService;
 
+
 	@Autowired
 	ScanPriceLogMSSqlMapper scanPriceLogMSSqlMapper;
 

@@ -18,6 +18,7 @@ public class SignUtils {
 	 */
 	public static String getSign(String requestJson, String token) throws ApplicationException {
 		String sign = null;
+
 		try {
 			sign = SignUtils.getSignBySHA512(requestJson, token);
 		} catch (Exception e) {

@@ -15,6 +15,7 @@ public class BatchAndItemLine {
 
 	private List<ItemLine> items = new ArrayList<>();
 
+
 	private String sign;
 
 	public String getStoreCode() {

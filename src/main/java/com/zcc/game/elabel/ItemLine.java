@@ -14,6 +14,7 @@ public class ItemLine {
 
 	private String price1;// retail_price
 
+
 	private String price2;// wasPrice
 
 	private String ean;// upc

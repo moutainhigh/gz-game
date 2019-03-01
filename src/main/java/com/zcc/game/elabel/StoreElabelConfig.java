@@ -29,6 +29,7 @@ public class StoreElabelConfig extends BaseDocument<BigInteger> {
 	private List<Integer> deptList = new ArrayList<>();
 	@Field("token")
 	private String token;
+
 	@Field("url")
 	private String url;
 	@Field("write_log_flag")
